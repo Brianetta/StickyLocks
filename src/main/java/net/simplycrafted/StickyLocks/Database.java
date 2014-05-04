@@ -22,13 +22,13 @@ import java.sql.*;
  */
 public class Database {
     // This class handles data storage for the StickyLocks plugin
-    static private Connection db;
+    static private Connection db_conn;
     static StickyLocks stickylocks;
 
     public Database() {
-        if (db == null) {
+        if (db_conn == null) {
             try {
-                db = DriverManager.getConnection("jdbc:sqlite:" + StickyLocks.getInstance().getDataFolder() + "/stickylocks.db");
+                db_conn = DriverManager.getConnection("jdbc:sqlite:" + StickyLocks.getInstance().getDataFolder() + "/stickylocks.db");
             } catch (SQLException e) {
                 StickyLocks.getInstance().getLogger().info(e.toString());
             }
@@ -40,7 +40,7 @@ public class Database {
         Statement sql;
         PreparedStatement psql;
         try {
-            sql = db.createStatement();
+            sql = db_conn.createStatement();
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 0)");
             // Re-populate this every time we load. The config file is authoritative.
             sql.executeUpdate("DROP TABLE IF EXISTS protectable");
@@ -51,7 +51,7 @@ public class Database {
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
                 Material material = Material.getMaterial(protectable);
                 if (material.isBlock()) {
-                    psql=db.prepareStatement("INSERT INTO protectable (material) VALUES (?)");
+                    psql= db_conn.prepareStatement("INSERT INTO protectable (material) VALUES (?)");
                     psql.setString(1, material.name());
                     psql.executeUpdate();
                     psql.close();
@@ -69,7 +69,7 @@ public class Database {
         PreparedStatement psql;
         ResultSet result;
         try {
-            psql = db.prepareStatement("SELECT UUID FROM player WHERE name LIKE ?");
+            psql = db_conn.prepareStatement("SELECT UUID FROM player WHERE name LIKE ?");
             psql.setString(1, name);
             result = psql.executeQuery();
             if(result.next()) {
@@ -92,7 +92,7 @@ public class Database {
         ResultSet result;
         Protection returnValue;
         try {
-            psql = db.prepareStatement("SELECT UUID,name " +
+            psql = db_conn.prepareStatement("SELECT UUID,name " +
                     "FROM protectable " +
                     "LEFT JOIN protected " +
                     "ON protectable.material=protected.material " +
@@ -131,7 +131,7 @@ public class Database {
 
     public void shutdown() {
         try {
-            db.close();
+            db_conn.close();
         } catch (SQLException e) {
             StickyLocks.getInstance().getLogger().info(e.toString());
         }
