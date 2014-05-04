@@ -1,0 +1,22 @@
+protectables:
+    - ANVIL
+    - CHEST
+    - DIODE_BLOCK_ON
+    - DIODE_BLOCK_OFF
+    - DISPENSER
+    - DROPPER
+    - FENCE_GATE
+    - FURNACE
+    - GOLD_PLATE
+    - HOPPER
+    - IRON_PLATE
+    - JUKEBOX
+    - LEVER
+    - REDSTONE_COMPARATOR_OFF
+    - STONE_BUTTON
+    - STONE_PLATE
+    - TRAP_DOOR
+    - TRAPPED_CHEST
+    - WOOD_BUTTON
+    - WOOD_PLATE
+    - WOODEN_DOOR
