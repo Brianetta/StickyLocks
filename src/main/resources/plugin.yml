@@ -1,3 +1,13 @@
 name: StickyLocks
 main: net.simplycrafted.StickyLocks.StickyLocks
 version: 0.1
+commands:
+    stickylocks:
+        description: Lock objects to prevent other players accessing them
+        usage:
+        - /<command> add [player|group]
+        - /<command> remove [player|group]
+        - /<command> group [group] add [player]
+        - /<command> group [group] remove [player]
+        permission: yes
+        aliases: sl
