@@ -1,5 +1,8 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+
 import java.sql.*;
 
 /**
@@ -34,10 +37,26 @@ public class Database {
 
     public void createTables() {
         Statement sql;
+        PreparedStatement psql;
         try {
             sql = db.createStatement();
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 0)");
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS protectable (id integer primary key autoincrement,material text,extrablock tinyint not null default 0,inventory tinyint not null default 0)");
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS protectable (material text primary key)");
+            // Re-populate this every time we load. The config file is authoritative.
+            sql.executeUpdate("DELETE FROM protectable");
+            sql.close();
+            // Load values for protectable blocks from the config
+            for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
+                Material material = Material.getMaterial(protectable);
+                if (material.isBlock()) {
+                    psql=db.prepareStatement("REPLACE INTO protectable (material) VALUES (?)");
+                    psql.setString(1, material.name());
+                    psql.executeUpdate();
+                    psql.close();
+                } else {
+                    stickylocks.getLogger().info(String.format("Warning: Configured item %s is not a Block type.",protectable));
+                }
+            }
             sql.close();
         } catch (SQLException e) {
             StickyLocks.getInstance().getLogger().info(e.toString());
@@ -45,17 +64,22 @@ public class Database {
     }
 
     public String getUUID (String name) {
-        Statement sql;
-        ResultSet result = null;
+        PreparedStatement psql;
+        ResultSet result;
         try {
-            sql = db.createStatement();
-        result = sql.executeQuery("SELECT UUID FROM player WHERE name LIKE '" + name + "'");
-        if(result.next()) {
-            return result.getString(1);
-        }
-        else {
-            return "";
-        }
+            psql = db.prepareStatement("SELECT UUID FROM player WHERE name LIKE ?");
+            psql.setString(1, name);
+            result = psql.executeQuery();
+            if(result.next()) {
+                String returnval = result.getString(1);
+                result.close();
+                psql.close();
+                return returnval;
+            } else {
+                result.close();
+                psql.close();
+                return "";
+            }
         } catch (SQLException e) {
             return "";
         }

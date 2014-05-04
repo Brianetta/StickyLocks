@@ -41,6 +41,7 @@ public class StickyLocks extends JavaPlugin {
         // Set up event handler for clicking blocks
         getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
 
+        // Initialise database, and create tables if necessary
         db=new Database();
         db.createTables();
     }

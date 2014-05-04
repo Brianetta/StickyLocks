@@ -25,7 +25,7 @@ import org.bukkit.inventory.InventoryHolder;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-public class StickyLocksClick implements Listener{
+public class StickyLocksClick implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Block target=event.getClickedBlock();
@@ -65,4 +65,3 @@ public class StickyLocksClick implements Listener{
         }
     }
 }
-
