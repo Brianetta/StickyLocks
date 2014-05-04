@@ -22,7 +22,7 @@ import java.sql.*;
  */
 public class Database {
     // This class handles data storage for the StickyLocks plugin
-    static Connection db;
+    static private Connection db;
     static StickyLocks stickylocks;
 
     public Database() {
