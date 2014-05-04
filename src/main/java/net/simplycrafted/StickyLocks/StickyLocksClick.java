@@ -28,13 +28,15 @@ import org.bukkit.inventory.InventoryHolder;
 public class StickyLocksClick implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+
+        int locX,locY,locZ;
+
         Block target=event.getClickedBlock();
         //if target.getType() ...check it's a protectable block type
         if (event.getAction()== Action.RIGHT_CLICK_BLOCK) {
             // Initiate locking, or present actions for locked item
             String info = "";
             Location whereisit;
-            info = info + target.getType().name();
             if (target.getState() instanceof Chest){
                 // Double chests have an ambiguous location. Get a unique location by
                 // asking the chest's Inventory for the location of its DoubleChest.
@@ -42,26 +44,26 @@ public class StickyLocksClick implements Listener {
                 InventoryHolder ih = chest.getInventory().getHolder();
                 if (ih instanceof DoubleChest) {
                     DoubleChest dc = (DoubleChest) ih;
-                    info = info + " " + dc.getLocation().getBlockX();
-                    info = info + "," + dc.getLocation().getBlockY();
-                    info = info + "," + dc.getLocation().getBlockZ();
+                    locX = dc.getLocation().getBlockX();
+                    locY = dc.getLocation().getBlockY();
+                    locZ = dc.getLocation().getBlockZ();
                 } else {
-                    info = info + " " + target.getLocation().getBlockX();
-                    info = info + "," + target.getLocation().getBlockY();
-                    info = info + "," + target.getLocation().getBlockZ();
+                    locX = target.getLocation().getBlockX();
+                    locY = target.getLocation().getBlockY();
+                    locZ = target.getLocation().getBlockZ();
                 }
             } else if (target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR")) {
                 // Doors have an ambiguous location, but we only need to check
                 // the block below to disambiguate.
-                info = info + " " + target.getLocation().getBlockX();
-                info = info + "," + (target.getLocation().getBlockY()-1);
-                info = info + "," + target.getLocation().getBlockZ();
+                locX = target.getLocation().getBlockX();
+                locY = target.getLocation().getBlockY()-1;
+                locZ = target.getLocation().getBlockZ();
             } else {
-                info = info + " " + target.getLocation().getBlockX();
-                info = info + "," + target.getLocation().getBlockY();
-                info = info + "," + target.getLocation().getBlockZ();
+                locX = target.getLocation().getBlockX();
+                locY = target.getLocation().getBlockY();
+                locZ = target.getLocation().getBlockZ();
             }
-            event.getPlayer().sendMessage(info);
+            event.getPlayer().sendMessage(String.format("%s (%d,%d,%d)",target.getType().name(),locX,locY,locZ));
         }
     }
 }
