@@ -1,5 +1,9 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,4 +35,18 @@ public class StickyLocks extends JavaPlugin {
         // Commands are handled in this class.
         getCommand("stickylocks").setExecutor(new StickyLocksCommand());
 
+        // Set up event handler for clicking blocks
+        getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
+
+    }
+
+    @Override
+    public void onDisable() {
+        PlayerInteractEvent.getHandlerList().unregister(stickylocks);
+    }
+
+    public static Plugin getInstance() {
+        // Other classes might need the plugin instance. This saves going through the PluginManager.
+        return stickylocks;
+    }
 }
