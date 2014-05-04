@@ -72,8 +72,10 @@ public class StickyLocksClick implements Listener {
                 locY = target.getLocation().getBlockY();
                 locZ = target.getLocation().getBlockZ();
             }
-            if (db.isProtectable(target))
+            if (db.isProtectable(target)) {
                 event.getPlayer().sendMessage(String.format("%s (%d,%d,%d)", target.getType().name(), locX, locY, locZ));
+                event.setCancelled(true);
+            }
         }
     }
 }
