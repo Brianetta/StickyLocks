@@ -1,6 +1,7 @@
 package net.simplycrafted.StickyLocks;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -26,6 +27,14 @@ import org.bukkit.inventory.InventoryHolder;
  * GNU General Public License for more details.
  */
 public class StickyLocksClick implements Listener {
+
+    Material tool;
+
+    // Get the tool item Material from the config
+    public StickyLocksClick() {
+        tool = Material.getMaterial(StickyLocks.getInstance().getConfig().getString("tool"));
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
 
@@ -33,7 +42,7 @@ public class StickyLocksClick implements Listener {
 
         Block target=event.getClickedBlock();
         //if target.getType() ...check it's a protectable block type
-        if (event.getAction()== Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction()== Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType() == tool) {
             // Initiate locking, or present actions for locked item
             String info = "";
             Location whereisit;

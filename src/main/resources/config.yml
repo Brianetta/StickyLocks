@@ -21,3 +21,4 @@ protectables:
     - WOOD_BUTTON
     - WOOD_PLATE
     - WOODEN_DOOR
+tool: STICK
