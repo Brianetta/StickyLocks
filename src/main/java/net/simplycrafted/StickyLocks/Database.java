@@ -1,7 +1,7 @@
 package net.simplycrafted.StickyLocks;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.block.Block;
 
 import java.sql.*;
 
@@ -49,7 +49,7 @@ public class Database {
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
                 Material material = Material.getMaterial(protectable);
                 if (material.isBlock()) {
-                    psql=db.prepareStatement("REPLACE INTO protectable (material) VALUES (?)");
+                    psql=db.prepareStatement("INSERT INTO protectable (material) VALUES (?)");
                     psql.setString(1, material.name());
                     psql.executeUpdate();
                     psql.close();
@@ -82,6 +82,28 @@ public class Database {
             }
         } catch (SQLException e) {
             return "";
+        }
+    }
+
+    public boolean isProtectable (Block block) {
+        PreparedStatement psql;
+        ResultSet result;
+        try {
+            psql = db.prepareStatement("SELECT count(material) FROM protectable WHERE material LIKE ?");
+            psql.setString(1, block.getType().name());
+            result = psql.executeQuery();
+            result.next();
+            if (result.getInt(1) > 0) {
+                result.close();
+                psql.close();
+                return true;
+            } else {
+                result.close();
+                psql.close();
+                return false;
+            }
+        } catch (SQLException e) {
+            return false;
         }
     }
 

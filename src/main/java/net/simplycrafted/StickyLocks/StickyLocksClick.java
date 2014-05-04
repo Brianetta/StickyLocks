@@ -29,6 +29,7 @@ import org.bukkit.inventory.InventoryHolder;
 public class StickyLocksClick implements Listener {
 
     Material tool;
+    Database db = new Database();
 
     // Get the tool item Material from the config
     public StickyLocksClick() {
@@ -72,7 +73,8 @@ public class StickyLocksClick implements Listener {
                 locY = target.getLocation().getBlockY();
                 locZ = target.getLocation().getBlockZ();
             }
-            event.getPlayer().sendMessage(String.format("%s (%d,%d,%d)",target.getType().name(),locX,locY,locZ));
+            if (db.isProtectable(target))
+                event.getPlayer().sendMessage(String.format("%s (%d,%d,%d)",target.getType().name(),locX,locY,locZ));
         }
     }
 }
