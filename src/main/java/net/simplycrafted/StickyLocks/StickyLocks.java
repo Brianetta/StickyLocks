@@ -1,5 +1,6 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -16,5 +17,18 @@ import org.bukkit.plugin.java.JavaPlugin;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
 public class StickyLocks extends JavaPlugin {
+
+    // There can be only one instance of this class. Store it here.
+    private static Plugin stickylocks;
+
+    @Override
+    public void onEnable() {
+        // We have the instance now. Keep it for convenience.
+        stickylocks = this;
+
+        // Commands are handled in this class.
+        getCommand("stickylocks").setExecutor(new StickyLocksCommand());
+
 }
