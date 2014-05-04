@@ -1,6 +1,5 @@
 package net.simplycrafted.StickyLocks;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.UUID;

@@ -1,9 +1,10 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.xml.crypto.Data;
+import java.util.HashMap;
 
 /**
  * Copyright © Brian Ronald
@@ -27,6 +28,8 @@ public class StickyLocks extends JavaPlugin {
 
     private static Database db;
 
+    public HashMap<Player,Location> SelectedBlock;
+
     @Override
     public void onEnable() {
         // Make sure the config's on disk and editable
@@ -44,12 +47,16 @@ public class StickyLocks extends JavaPlugin {
         // Initialise database, and create tables if necessary
         db=new Database();
         db.createTables();
+
+        // Which block players mighht have selected
+        SelectedBlock = new HashMap<Player,Location>();
     }
 
     @Override
     public void onDisable() {
         PlayerInteractEvent.getHandlerList().unregister(stickylocks);
         db.shutdown();
+        SelectedBlock.clear();
     }
 
     public static StickyLocks getInstance() {

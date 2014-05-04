@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -30,16 +31,19 @@ public class StickyLocksClick implements Listener {
 
     Material tool;
     Database db = new Database();
+    static StickyLocks stickylocks;
 
     // Get the tool item Material from the config
     public StickyLocksClick() {
-        tool = Material.getMaterial(StickyLocks.getInstance().getConfig().getString("tool"));
+        stickylocks=StickyLocks.getInstance();
+        tool = Material.getMaterial(stickylocks.getConfig().getString("tool"));
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
 
         Block target=event.getClickedBlock();
+        Player player=event.getPlayer();
         //if target.getType() ...check it's a protectable block type
         if (event.getAction()== Action.RIGHT_CLICK_BLOCK) {
             // Right-clicks are either with a stick, or not
@@ -47,12 +51,16 @@ public class StickyLocksClick implements Listener {
                 // Stick used - initiate locking, or present actions for locked item
                 String info = "";
                 Location loc= getUnambiguousLocation(target);
-                Protection protection = db.getProtection(target,getUnambiguousLocation(target));
+                Protection protection = db.getProtection(target,loc);
                 if (protection.getType() != null) {
+                    if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(loc) < 1)) {
+                        stickylocks.SelectedBlock.put(player,loc);
+                        player.sendMessage("Selecting this block:");
+                    }
                     if (protection.isProtected())
-                        event.getPlayer().sendMessage(String.format("%s owned by %s",protection.getType(),protection.getOwnerName()));
+                        player.sendMessage(String.format("%s owned by %s",protection.getType(),protection.getOwnerName()));
                     else
-                        event.getPlayer().sendMessage(String.format("Unowned %s",protection.getType()));
+                        player.sendMessage(String.format("Unowned %s",protection.getType()));
                     event.setCancelled(true);
                 }
             } else {
