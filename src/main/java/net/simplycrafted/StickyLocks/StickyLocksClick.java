@@ -46,7 +46,6 @@ public class StickyLocksClick implements Listener {
         if (event.getAction()== Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType() == tool) {
             // Initiate locking, or present actions for locked item
             String info = "";
-            Location whereisit;
             if (target.getState() instanceof Chest){
                 // Double chests have an ambiguous location. Get a unique location by
                 // asking the chest's Inventory for the location of its DoubleChest.
@@ -74,7 +73,7 @@ public class StickyLocksClick implements Listener {
                 locZ = target.getLocation().getBlockZ();
             }
             if (db.isProtectable(target))
-                event.getPlayer().sendMessage(String.format("%s (%d,%d,%d)",target.getType().name(),locX,locY,locZ));
+                event.getPlayer().sendMessage(String.format("%s (%d,%d,%d)", target.getType().name(), locX, locY, locZ));
         }
     }
 }
