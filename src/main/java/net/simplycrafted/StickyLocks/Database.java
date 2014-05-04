@@ -1,5 +1,6 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -41,9 +42,10 @@ public class Database {
         try {
             sql = db.createStatement();
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 0)");
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS protectable (material text primary key)");
             // Re-populate this every time we load. The config file is authoritative.
-            sql.executeUpdate("DELETE FROM protectable");
+            sql.executeUpdate("DROP TABLE IF EXISTS protectable");
+            sql.executeUpdate("CREATE TABLE protectable (material text primary key)");
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS protected (x integer, y integer, z integer, world text, material text, owner char(36),PRIMARY KEY (x,y,z,world))");
             sql.close();
             // Load values for protectable blocks from the config
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
@@ -85,25 +87,45 @@ public class Database {
         }
     }
 
-    public boolean isProtectable (Block block) {
+    public Protection getProtection (Block block,Location location) {
         PreparedStatement psql;
         ResultSet result;
+        Protection returnValue;
         try {
-            psql = db.prepareStatement("SELECT count(material) FROM protectable WHERE material LIKE ?");
-            psql.setString(1, block.getType().name());
+            psql = db.prepareStatement("SELECT UUID,name " +
+                    "FROM protectable " +
+                    "LEFT JOIN protected " +
+                    "ON protectable.material=protected.material " +
+                    "AND x=?" +
+                    "AND y=?" +
+                    "AND z=?" +
+                    "AND world=? " +
+                    "LEFT JOIN player " +
+                    "ON owner=UUID " +
+                    "WHERE protectable.material LIKE ?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, block.getLocation().getWorld().getName());
+            psql.setString(5, block.getType().name());
             result = psql.executeQuery();
-            result.next();
-            if (result.getInt(1) > 0) {
+            if (result.next()) {
+                String owner=result.getString(1);
+                if (result.wasNull()) {
+                    returnValue = new Protection(block.getType(), false, null, null);
+                } else {
+                    returnValue = new Protection(block.getType(), true, owner, result.getString(2));
+                }
                 result.close();
                 psql.close();
-                return true;
+                return returnValue;
             } else {
                 result.close();
                 psql.close();
-                return false;
+                return new Protection(null, false, null, null);
             }
         } catch (SQLException e) {
-            return false;
+            return new Protection(null, false, null, null);
         }
     }
 
