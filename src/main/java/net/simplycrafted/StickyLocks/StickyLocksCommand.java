@@ -23,12 +23,16 @@ import java.util.UUID;
  * GNU General Public License for more details.
  */
 public class StickyLocksCommand implements CommandExecutor {
-    private Plugin stickylocks = StickyLocks.getInstance();
+    private StickyLocks stickylocks = StickyLocks.getInstance();
 
     public boolean onCommand (CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equals("stickylocks")) {
             if (sender instanceof Player) {
                 // Player-specific commands
+                if (args.length > 0) {
+                    Database db=new Database();
+                    sender.sendMessage(db.getUUID(args[0]));
+                }
                 return true;
             } else {
                 // Commands that can also be run from console
