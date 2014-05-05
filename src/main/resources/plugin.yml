@@ -1,5 +1,7 @@
 name: StickyLocks
 main: net.simplycrafted.StickyLocks.StickyLocks
+author: Brianetta
+website: https://github.com/Brianetta/StickyLocks
 version: 0.1
 commands:
     stickylocks:
