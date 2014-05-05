@@ -29,10 +29,21 @@ public class StickyLocksCommand implements CommandExecutor {
             if (sender instanceof Player) {
                 // Player-specific commands
                 if (args.length > 0) {
-                    Database db=new Database();
-                    sender.sendMessage(db.getUUID(args[0]));
+                    switch (args[0]) {
+                        case "show" :
+                            return true;
+                        case "add" :
+                            return true;
+                        case "remove" :
+                            return true;
+                        case "group" :
+                            return true;
+                        case "info" :
+                            return true;
+                        default:
+                            return false;
+                    }
                 }
-                return true;
             } else {
                 // Commands that can also be run from console
                 return true;
