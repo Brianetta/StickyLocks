@@ -64,6 +64,9 @@ public class StickyLocksClick implements Listener {
                 }
             } else {
                 // Right-click without a stick
+                Protection protection = db.getProtection(target);
+                if (protection.isProtected())
+                    player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
             }
         } else {
             // Player is interacting in some other way
