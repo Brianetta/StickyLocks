@@ -87,6 +87,9 @@ public class StickyLocksClick implements Listener {
                 }
             } else if (event.getAction() == Action.PHYSICAL) {
                 // Pressure plate action
+                Protection protection = db.getProtection(target);
+                if (protection.isProtected())
+                    player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
             }
         }
     }
