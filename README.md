@@ -31,10 +31,10 @@ Towny, Factions or WorldGuard regions.
 - User-configurable tool
 - Right-click a protectable block with a tool, tells you who owns it (and cancels event)
 - Right-click a protectable block with a tool, selects it (and cancels event)
+- Allow users to claim and unclaim a protectable block
 
 ## To-do: ##
 
-- Allow users to claim a protectable block
 - Allow users to add users and groups of users to an allowed list
 - Actually enforce these lists
 - Also handle pressure plate interaction
