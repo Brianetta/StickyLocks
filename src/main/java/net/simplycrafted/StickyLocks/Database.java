@@ -26,7 +26,10 @@ import java.sql.*;
  * GNU General Public License for more details.
  */
 public class Database {
-    // This class handles data storage for the StickyLocks plugin
+    // This class handles data storage for the StickyLocks plugin.
+    // This class does not talk to players.
+    // Only this class talks to the database.
+
     static private Connection db_conn;
     static StickyLocks stickylocks;
 
@@ -67,28 +70,6 @@ public class Database {
             sql.close();
         } catch (SQLException e) {
             StickyLocks.getInstance().getLogger().info(e.toString());
-        }
-    }
-
-    public String getUUID (String name) {
-        PreparedStatement psql;
-        ResultSet result;
-        try {
-            psql = db_conn.prepareStatement("SELECT UUID FROM player WHERE name LIKE ?");
-            psql.setString(1, name);
-            result = psql.executeQuery();
-            if(result.next()) {
-                String returnval = result.getString(1);
-                result.close();
-                psql.close();
-                return returnval;
-            } else {
-                result.close();
-                psql.close();
-                return "";
-            }
-        } catch (SQLException e) {
-            return "";
         }
     }
 
