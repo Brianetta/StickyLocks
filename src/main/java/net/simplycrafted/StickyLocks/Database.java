@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.sql.*;
@@ -163,6 +164,24 @@ public class Database {
             }
         } catch (SQLException e) {
             return new Protection(null, false, null, null);
+        }
+    }
+
+    public void lockBlock(Block block, Player player) {
+        PreparedStatement psql;
+        Location location = getUnambiguousLocation(block);
+        try {
+            psql = db_conn.prepareStatement("REPLACE INTO protected (x,y,z,world,material,owner) VALUES (?,?,?,?,?,?) ");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            psql.setString(5, block.getType().name());
+            psql.setString(6, player.getUniqueId().toString());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to insert record to lock block");
         }
     }
 

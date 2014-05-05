@@ -49,7 +49,6 @@ public class StickyLocksClick implements Listener {
             // Right-clicks are either with a stick, or not
             if (event.getPlayer().getItemInHand().getType() == tool) {
                 // Stick used - initiate locking, or present actions for locked item
-                String info = "";
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
                     if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
@@ -60,8 +59,8 @@ public class StickyLocksClick implements Listener {
                         player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
                     else
                         player.sendMessage(String.format("Unowned %s", protection.getType()));
-                    event.setCancelled(true);
                 }
+                event.setCancelled(true);
             } else {
                 // Right-click without a stick
                 Protection protection = db.getProtection(target);
@@ -70,6 +69,29 @@ public class StickyLocksClick implements Listener {
             }
         } else {
             // Player is interacting in some other way
+            if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                // Left-clicks are either with a stick, or not
+                if (event.getPlayer().getItemInHand().getType() == tool) {
+                    // Stick used - check if it's the selected block, and lock/unlock if appropriate
+                    if (stickylocks.SelectedBlock.get(player) != null && stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1) {
+                        // Just left-clicked the selected block with a stick!
+                        Protection protection = db.getProtection(target);
+                        if (protection.isProtected()) {
+                            if (protection.getOwner() == player.getUniqueId()) {
+                                // UNLOCK the block
+                            } else {
+                                // Tell the player it's somebody else's block
+                            }
+                        } else if (protection.getType() != null) {
+                            player.sendMessage("Locking...");
+                            db.lockBlock(target,player);
+                        }
+                    }
+                    event.setCancelled(true);
+                }
+            } else if (event.getAction() == Action.PHYSICAL) {
+                // Pressure plate action
+            }
         }
     }
 }
