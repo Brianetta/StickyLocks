@@ -6,13 +6,31 @@ version: 0.1
 commands:
     stickylocks:
         description: Lock objects to prevent other players accessing them
-        usage:
-        - /<command> show
-        - /<command> add [player|group]
-        - /<command> remove [player|group]
-        - /<command> group [group]
-        - /<command> group [group] add [player]
-        - /<command> group [group] remove [player]
-        - /<command> group [group] rename [name]
-        permission: yes
+        usage: |
+            /<command> show
+            /<command> add [player|group]
+            /<command> remove [player|group]
+            /<command> group [group]
+            /<command> group [group] add [player]
+            /<command> group [group] remove [player]
+            /<command> group [group] rename [name]
+        permission: stickylocks.lock
         aliases: sl
+permissions:
+    stickylocks.*:
+        description: All StickyLocks permissions
+        children:
+            stickylocks.lock: true
+            stickylocks.locksmith: true
+            stickylocks.ghost: true
+    stickylocks.lock:
+        description: Can lock and unlock blocks
+        default: yes
+    stickylocks.locksmith:
+        description: Can manipulate all locks
+        default: op
+        children:
+            stickylocks.lock: true
+    stickylocks.ghost:
+        description: Locks have no effect
+        default: op
