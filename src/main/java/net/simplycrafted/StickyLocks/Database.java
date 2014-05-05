@@ -58,7 +58,7 @@ public class Database {
             // Load values for protectable blocks from the config
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
                 Material material = Material.getMaterial(protectable);
-                if (material.isBlock()) {
+                if (material != null && material.isBlock()) {
                     psql= db_conn.prepareStatement("INSERT INTO protectable (material) VALUES (?)");
                     psql.setString(1, material.name());
                     psql.executeUpdate();
