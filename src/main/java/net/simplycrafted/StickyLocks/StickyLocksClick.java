@@ -76,7 +76,7 @@ public class StickyLocksClick implements Listener {
                                 player.sendMessage("Unlocking...");
                                 db.unlockBlock(target);
                             } else {
-                                // Tell the player it's somebody else's block
+                                player.sendMessage("Not yours.");
                             }
                         } else if (protection.getType() != null) {
                             player.sendMessage("Locking...");
