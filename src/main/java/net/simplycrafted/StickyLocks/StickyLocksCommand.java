@@ -29,7 +29,7 @@ public class StickyLocksCommand implements CommandExecutor {
             if (sender instanceof Player) {
                 // Player-specific commands
                 if (args.length > 0) {
-                    switch (args[0]) {
+                    switch (args[0].toLowerCase()) {
                         case "show" :
                             return true;
                         case "add" :
