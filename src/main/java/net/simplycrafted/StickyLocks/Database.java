@@ -3,6 +3,10 @@ package net.simplycrafted.StickyLocks;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.sql.*;
 
@@ -87,10 +91,43 @@ public class Database {
         }
     }
 
-    public Protection getProtection (Block block,Location location) {
+    private Location getUnambiguousLocation(Block target) {
+        int locX,locY,locZ;
+
+        if (target.getState() instanceof Chest) {
+            // Double chests have an ambiguous location. Get a unique location by
+            // asking the chest's Inventory for the location of its DoubleChest.
+            Chest chest = (Chest) target.getState();
+            InventoryHolder ih = chest.getInventory().getHolder();
+            if (ih instanceof DoubleChest) {
+                DoubleChest dc = (DoubleChest) ih;
+                locX = dc.getLocation().getBlockX();
+                locY = dc.getLocation().getBlockY();
+                locZ = dc.getLocation().getBlockZ();
+            } else {
+                locX = target.getLocation().getBlockX();
+                locY = target.getLocation().getBlockY();
+                locZ = target.getLocation().getBlockZ();
+            }
+        } else if (target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR")) {
+            // Doors have an ambiguous location, but we only need to check
+            // the block below to disambiguate.
+            locX = target.getLocation().getBlockX();
+            locY = target.getLocation().getBlockY() - 1;
+            locZ = target.getLocation().getBlockZ();
+        } else {
+            locX = target.getLocation().getBlockX();
+            locY = target.getLocation().getBlockY();
+            locZ = target.getLocation().getBlockZ();
+        }
+        return new Location(target.getWorld(),locX,locY,locZ);
+    }
+
+    public Protection getProtection (Block block) {
         PreparedStatement psql;
         ResultSet result;
         Protection returnValue;
+        Location location = getUnambiguousLocation(block);
         try {
             psql = db_conn.prepareStatement("SELECT UUID,name " +
                     "FROM protectable " +

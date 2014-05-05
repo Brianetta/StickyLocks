@@ -35,32 +35,31 @@ public class StickyLocksClick implements Listener {
 
     // Get the tool item Material from the config
     public StickyLocksClick() {
-        stickylocks=StickyLocks.getInstance();
+        stickylocks = StickyLocks.getInstance();
         tool = Material.getMaterial(stickylocks.getConfig().getString("tool"));
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
 
-        Block target=event.getClickedBlock();
-        Player player=event.getPlayer();
+        Block target = event.getClickedBlock();
+        Player player = event.getPlayer();
         //if target.getType() ...check it's a protectable block type
-        if (event.getAction()== Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Right-clicks are either with a stick, or not
             if (event.getPlayer().getItemInHand().getType() == tool) {
                 // Stick used - initiate locking, or present actions for locked item
                 String info = "";
-                Location loc= getUnambiguousLocation(target);
-                Protection protection = db.getProtection(target,loc);
+                Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
-                    if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(loc) < 1)) {
-                        stickylocks.SelectedBlock.put(player,loc);
+                    if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
+                        stickylocks.SelectedBlock.put(player, target.getLocation());
                         player.sendMessage("Selecting this block:");
                     }
                     if (protection.isProtected())
-                        player.sendMessage(String.format("%s owned by %s",protection.getType(),protection.getOwnerName()));
+                        player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
                     else
-                        player.sendMessage(String.format("Unowned %s",protection.getType()));
+                        player.sendMessage(String.format("Unowned %s", protection.getType()));
                     event.setCancelled(true);
                 }
             } else {
@@ -69,37 +68,5 @@ public class StickyLocksClick implements Listener {
         } else {
             // Player is interacting in some other way
         }
-    }
-
-    private Location getUnambiguousLocation(Block target) {
-        int locX,locY,locZ;
-
-        if (target.getState() instanceof Chest) {
-            // Double chests have an ambiguous location. Get a unique location by
-            // asking the chest's Inventory for the location of its DoubleChest.
-            Chest chest = (Chest) target.getState();
-            InventoryHolder ih = chest.getInventory().getHolder();
-            if (ih instanceof DoubleChest) {
-                DoubleChest dc = (DoubleChest) ih;
-                locX = dc.getLocation().getBlockX();
-                locY = dc.getLocation().getBlockY();
-                locZ = dc.getLocation().getBlockZ();
-            } else {
-                locX = target.getLocation().getBlockX();
-                locY = target.getLocation().getBlockY();
-                locZ = target.getLocation().getBlockZ();
-            }
-        } else if (target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR")) {
-            // Doors have an ambiguous location, but we only need to check
-            // the block below to disambiguate.
-            locX = target.getLocation().getBlockX();
-            locY = target.getLocation().getBlockY() - 1;
-            locZ = target.getLocation().getBlockZ();
-        } else {
-            locX = target.getLocation().getBlockX();
-            locY = target.getLocation().getBlockY();
-            locZ = target.getLocation().getBlockZ();
-        }
-        return new Location(target.getWorld(),locX,locY,locZ);
     }
 }
