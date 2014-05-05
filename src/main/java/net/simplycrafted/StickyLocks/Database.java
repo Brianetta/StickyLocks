@@ -152,7 +152,7 @@ public class Database {
         PreparedStatement psql;
         Location location = getUnambiguousLocation(block);
         try {
-            psql = db_conn.prepareStatement("REPLACE INTO protected (x,y,z,world,material,owner) VALUES (?,?,?,?,?,?) ");
+            psql = db_conn.prepareStatement("REPLACE INTO protected (x,y,z,world,material,owner) VALUES (?,?,?,?,?,?)");
             psql.setInt(1, location.getBlockX());
             psql.setInt(2, location.getBlockY());
             psql.setInt(3, location.getBlockZ());
@@ -163,6 +163,22 @@ public class Database {
             psql.close();
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to insert record to lock block");
+        }
+    }
+
+    public void unlockBlock(Block block) {
+        PreparedStatement psql;
+        Location location = getUnambiguousLocation(block);
+        try {
+            psql = db_conn.prepareStatement("DELETE FROM protected WHERE x=? AND y=? AND z=? AND world=?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to remove record to unlock block");
         }
     }
 

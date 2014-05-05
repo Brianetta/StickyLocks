@@ -72,8 +72,9 @@ public class StickyLocksClick implements Listener {
                         // Just left-clicked the selected block with a stick!
                         Protection protection = db.getProtection(target);
                         if (protection.isProtected()) {
-                            if (protection.getOwner() == player.getUniqueId()) {
-                                // UNLOCK the block
+                            if (protection.getOwner().equals(player.getUniqueId())) {
+                                player.sendMessage("Unlocking...");
+                                db.unlockBlock(target);
                             } else {
                                 // Tell the player it's somebody else's block
                             }
