@@ -36,8 +36,9 @@ public class Database {
     public Database() {
         if (db_conn == null) {
             try {
+                Class.forName("org.sqlite.JDBC");
                 db_conn = DriverManager.getConnection("jdbc:sqlite:" + StickyLocks.getInstance().getDataFolder() + "/stickylocks.db");
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 StickyLocks.getInstance().getLogger().info(e.toString());
             }
         }
@@ -54,6 +55,8 @@ public class Database {
             sql.executeUpdate("DROP TABLE IF EXISTS protectable");
             sql.executeUpdate("CREATE TABLE protectable (material text primary key)");
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS protected (x integer, y integer, z integer, world text, material text, owner char(36),PRIMARY KEY (x,y,z,world))");
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS accessgroup (owner char(36),name text,member char(36),PRIMARY KEY (owner,name))");
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS accesslist (owner char(36),member text,x integer,y integer,z integer,world text)");
             sql.close();
             // Load values for protectable blocks from the config
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
