@@ -22,3 +22,4 @@ protectables:
     - WOOD_PLATE
     - WOODEN_DOOR
 tool: STICK
+chatprefix: SL

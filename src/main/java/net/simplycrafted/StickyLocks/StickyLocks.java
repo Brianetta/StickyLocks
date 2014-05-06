@@ -1,6 +1,9 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,5 +68,12 @@ public class StickyLocks extends JavaPlugin {
     public static StickyLocks getInstance() {
         // Other classes might need the plugin instance. This saves going through the PluginManager.
         return stickylocks;
+    }
+
+    public void sendMessage(CommandSender player, String message, boolean locked) {
+        if (locked)
+            player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"),ChatColor.DARK_RED,message));
+        else
+            player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"),ChatColor.DARK_GREEN,message));
     }
 }

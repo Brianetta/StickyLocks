@@ -1,5 +1,6 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -46,40 +47,44 @@ public class StickyLocksClick implements Listener {
                 // Stick used - initiate locking, or present actions for locked item
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
+                    String selected="";
                     if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
                         stickylocks.SelectedBlock.put(player, target.getLocation());
-                        player.sendMessage("Selecting this block:");
+                        selected = " " + ChatColor.RED + "(selected)";
                     }
                     if (protection.isProtected())
-                        player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
+                        if (!protection.getOwner().equals(player.getUniqueId()))
+                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(),selected), true);
+                        else
+                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(),selected), false);
                     else
-                        player.sendMessage(String.format("Unowned %s", protection.getType()));
+                        stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(),selected), false);
                 }
                 event.setCancelled(true);
             } else {
                 // Right-click without a stick
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected())
-                    player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
+                    stickylocks.sendMessage(player,String.format("%s owned by %s", protection.getType(), protection.getOwnerName()),true);
             }
         } else {
             // Player is interacting in some other way
             if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                 // Left-clicks are either with a stick, or not
-                if (event.getPlayer().getItemInHand().getType() == tool) {
+                if (player.getItemInHand().getType() == tool) {
                     // Stick used - check if it's the selected block, and lock/unlock if appropriate
                     if (stickylocks.SelectedBlock.get(player) != null && stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1) {
                         // Just left-clicked the selected block with a stick!
                         Protection protection = db.getProtection(target);
                         if (protection.isProtected()) {
-                            if (protection.getOwner().equals(player.getUniqueId())) {
-                                player.sendMessage("Unlocking...");
+                            if (protection.getOwner().equals(player.getUniqueId()) {
+                                stickylocks.sendMessage(player,"Unlocking...",false);
                                 db.unlockBlock(target);
                             } else {
-                                player.sendMessage("Not yours.");
+                                stickylocks.sendMessage(player,"You do not own this object.",true);
                             }
                         } else if (protection.getType() != null) {
-                            player.sendMessage("Locking...");
+                            stickylocks.sendMessage(player,"Locking...",false);
                             db.lockBlock(target,player);
                         }
                     }
@@ -89,7 +94,7 @@ public class StickyLocksClick implements Listener {
                 // Pressure plate action
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected())
-                    player.sendMessage(String.format("%s owned by %s", protection.getType(), protection.getOwnerName()));
+                    stickylocks.sendMessage(player,String.format("%s owned by %s", protection.getType(), protection.getOwnerName()),true);
             }
         }
     }

@@ -29,14 +29,19 @@ public class StickyLocksCommand implements CommandExecutor {
                 if (args.length > 0) {
                     switch (args[0].toLowerCase()) {
                         case "show" :
+                            stickylocks.sendMessage(sender,"show: Not implemented yet.", true);
                             return true;
                         case "add" :
+                            stickylocks.sendMessage(sender,"add: Not implemented yet.", true);
                             return true;
                         case "remove" :
+                            stickylocks.sendMessage(sender,"remove: Not implemented yet.", true);
                             return true;
                         case "group" :
+                            stickylocks.sendMessage(sender,"group: Not implemented yet.", true);
                             return true;
                         case "info" :
+                            stickylocks.sendMessage(sender,"info: Not implemented yet.", true);
                             return true;
                         default:
                             return false;
@@ -44,6 +49,7 @@ public class StickyLocksCommand implements CommandExecutor {
                 }
             } else {
                 // Commands that can also be run from console
+                stickylocks.sendMessage(sender,"This doesn't work from console yet.", true);
                 return true;
             }
         }
