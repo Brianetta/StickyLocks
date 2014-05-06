@@ -192,4 +192,18 @@ public class Database {
             StickyLocks.getInstance().getLogger().info(e.toString());
         }
     }
+
+    public void addPlayer(Player player) {
+        PreparedStatement psql;
+        try {
+            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify) values (?,?,(SELECT notify FROM player WHERE uuid=?))");
+            psql.setString(1, player.getUniqueId().toString());
+            psql.setString(2, player.getName());
+            psql.setString(3, player.getUniqueId().toString());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to insert/replace newly joined player");
+        }
+    }
 }
