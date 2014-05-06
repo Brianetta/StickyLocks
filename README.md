@@ -32,12 +32,12 @@ Towny, Factions or WorldGuard regions.
 - Right-click a protectable block with a tool, tells you who owns it (and cancels event)
 - Right-click a protectable block with a tool, selects it (and cancels event)
 - Allow users to claim and unclaim a protectable block
+- Permissions acted on
 
 ## To-do: ##
 
 - Allow users to add users and groups of users to an allowed list
 - Actually enforce these lists
-- Also handle pressure plate interaction
 - Integrate with Logblock (and, perhaps, other logging tools) to limit ownership claim to player who placed block
 - Add option to protect blocks with an inventory from being broken
 - Handle blocks which change Type naturally (such as a redstone repeater)
