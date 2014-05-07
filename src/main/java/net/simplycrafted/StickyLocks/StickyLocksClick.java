@@ -49,6 +49,7 @@ public class StickyLocksClick implements Listener {
                 if (protection.getType() != null) {
                     String selected="";
                     if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
+                        // Block is not one previously selected
                         stickylocks.SelectedBlock.put(player, target.getLocation());
                         selected = " " + ChatColor.RED + "(selected)";
                     }
@@ -57,6 +58,7 @@ public class StickyLocksClick implements Listener {
                             stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), false);
                         else
                             stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(),selected), !player.hasPermission("stickylocks.locksmith"));
+                            // Use of permission on previous line changes colour of message
                     else
                         stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(),selected), false);
                 }
@@ -69,6 +71,7 @@ public class StickyLocksClick implements Listener {
                         stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), false);
                     } else {
                         stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), !player.hasPermission("stickylocks.ghost"));
+                        // Use of permission on previous line changes colour of message
                     }
                 }
             }
@@ -104,6 +107,12 @@ public class StickyLocksClick implements Listener {
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected())
                     stickylocks.sendMessage(player,String.format("%s owned by %s", protection.getType(), protection.getOwnerName()),true);
+            } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+                if (player.getItemInHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
+                    // Player right-clicked nothing - Deselect whatever might be selected.
+                    stickylocks.SelectedBlock.remove(player);
+                    stickylocks.sendMessage(player,"Selection cleared",false);
+                }
             }
         }
     }
