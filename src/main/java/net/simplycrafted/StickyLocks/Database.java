@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.sql.*;
+import java.util.UUID;
 
 /**
  * Copyright © Brian Ronald
@@ -55,7 +56,7 @@ public class Database {
             sql.executeUpdate("DROP TABLE IF EXISTS protectable");
             sql.executeUpdate("CREATE TABLE protectable (material text primary key)");
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS protected (x integer, y integer, z integer, world text, material text, owner char(36),PRIMARY KEY (x,y,z,world))");
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS accessgroup (owner char(36),name text,member char(36),PRIMARY KEY (owner,name))");
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS accessgroup (owner char(36),name text,member char(36),PRIMARY KEY (owner,name,member))");
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS accesslist (owner char(36),member text,x integer,y integer,z integer,world text)");
             sql.close();
             // Load values for protectable blocks from the config
@@ -205,5 +206,126 @@ public class Database {
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to insert/replace newly joined player");
         }
+    }
+
+    public String addPlayerToGroup(UUID owner, String group, String member) {
+        PreparedStatement psql;
+        String memberUUID;
+        ResultSet result;
+        try {
+            psql = db_conn.prepareStatement("SELECT uuid FROM player WHERE name LIKE ?");
+            psql.setString(1,member);
+            result = psql.executeQuery();
+            if (result.next()) {
+                memberUUID = result.getString(1);
+            } else {
+                return String.format("Player %s is not known", member);
+            }
+            result.close();
+            psql = db_conn.prepareStatement("REPLACE INTO accessgroup (owner, name, member) VALUES (?,?,?)");
+            psql.setString(1,owner.toString());
+            psql.setString(2,group);
+            psql.setString(3,memberUUID);
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to insert/replace group member");
+        }
+        return null;
+    }
+
+    public String removePlayerFromGroup(UUID owner, String group, String member) {
+        PreparedStatement psql;
+        String memberUUID;
+        ResultSet result;
+        try {
+            psql = db_conn.prepareStatement("SELECT uuid FROM player WHERE name LIKE ?");
+            psql.setString(1,member);
+            result = psql.executeQuery();
+            if (result.next()) {
+                memberUUID = result.getString(1);
+            } else {
+                return String.format("Player %s is not known", member);
+            }
+            result.close();
+            psql = db_conn.prepareStatement("DELETE FROM accessgroup WHERE owner=? AND name LIKE ? AND member=?");
+            psql.setString(1,owner.toString());
+            psql.setString(2,group);
+            psql.setString(3,memberUUID);
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to remove group member");
+        }
+        return null;
+    }
+
+    public String renameGroup(UUID owner, String group, String newName) {
+        PreparedStatement psql;
+        try {
+            psql = db_conn.prepareStatement("UPDATE accessgroup SET name=? WHERE owner=? AND name LIKE ?");
+            psql.setString(1,newName);
+            psql.setString(2,owner.toString());
+            psql.setString(3,group);
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to remove group member");
+        }
+        return null;
+    }
+
+    public PlayerGroupList getGroup(UUID owner, String name) {
+        PlayerGroupList groupList = new PlayerGroupList();
+        PreparedStatement psql;
+        ResultSet result;
+        try {
+            psql = db_conn.prepareStatement("SELECT player.name FROM accessgroup INNER JOIN player ON member=uuid WHERE owner=? AND accessgroup.name=?");
+            psql.setString(1, owner.toString());
+            psql.setString(2, name);
+            result = psql.executeQuery();
+            while(result.next()) {
+                groupList.insert(result.getString(1));
+            }
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to retrieve group list");
+        }
+        return groupList;
+    }
+
+    public UUID getUUID(Location blockLocation) {
+        Location location = getUnambiguousLocation(blockLocation.getBlock());
+        PreparedStatement psql;
+        ResultSet result;
+        UUID returnVal = null;
+        try {
+            psql = db_conn.prepareStatement("SELECT owner " +
+                    "FROM protectable " +
+                    "INNER JOIN protected " +
+                    "ON protectable.material=protected.material " +
+                    "AND x=?" +
+                    "AND y=?" +
+                    "AND z=?" +
+                    "AND world=?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            result = psql.executeQuery();
+            if (result.next()) {
+                result.getString(1);
+                if (result.wasNull()) {
+                    returnVal = null;
+                } else {
+                    returnVal = UUID.fromString(result.getString(1));
+                }
+            }
+            result.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to retrieve UUID from block");
+        }
+        return returnVal;
     }
 }
