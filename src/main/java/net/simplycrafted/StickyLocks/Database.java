@@ -285,7 +285,9 @@ public class Database {
             psql.setString(2, name);
             result = psql.executeQuery();
             while(result.next()) {
-                groupList.insert(result.getString(1));
+                result.getString(1);
+                if(!result.wasNull())
+                    groupList.insert(result.getString(1));
             }
             psql.close();
         } catch (SQLException e) {

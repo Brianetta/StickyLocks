@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
@@ -61,9 +62,8 @@ public class StickyLocksCommand implements CommandExecutor {
                                 } else {
                                     stickylocks.sendMessage(sender, String.format("Members of group %s:", args[1]), true);
                                     // Show group
-                                    String name = groupMembers.getFirst();
-                                    while (name != null) {
-                                        stickylocks.sendMessage(sender, groupMembers.getNext(),true);
+                                    for (Iterator iterator = groupMembers.getIterator(); iterator.hasNext();) {
+                                        stickylocks.sendMessage(sender, iterator.next().toString(), true);
                                     }
                                 }
                                 return true;
