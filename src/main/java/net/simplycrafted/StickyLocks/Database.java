@@ -280,7 +280,7 @@ public class Database {
         PreparedStatement psql;
         ResultSet result;
         try {
-            psql = db_conn.prepareStatement("SELECT player.name FROM accessgroup INNER JOIN player ON member=uuid WHERE owner=? AND accessgroup.name=?");
+            psql = db_conn.prepareStatement("SELECT player.name FROM accessgroup INNER JOIN player ON member=uuid WHERE owner=? AND accessgroup.name=? ORDER BY player.name");
             psql.setString(1, owner.toString());
             psql.setString(2, name);
             result = psql.executeQuery();
@@ -291,7 +291,7 @@ public class Database {
             }
             psql.close();
         } catch (SQLException e) {
-            stickylocks.getLogger().info("Failed to retrieve group list");
+            stickylocks.getLogger().info("Failed to retrieve group membership list");
         }
         return groupList;
     }
@@ -329,5 +329,25 @@ public class Database {
             stickylocks.getLogger().info("Failed to retrieve UUID from block");
         }
         return returnVal;
+    }
+
+    public PlayerGroupList listGroups(UUID owner) {
+        PlayerGroupList groupList = new PlayerGroupList();
+        PreparedStatement psql;
+        ResultSet result;
+        try {
+            psql = db_conn.prepareStatement("SELECT name FROM accessgroup WHERE owner=? GROUP BY name ORDER BY name");
+            psql.setString(1, owner.toString());
+            result = psql.executeQuery();
+            while(result.next()) {
+                result.getString(1);
+                if(!result.wasNull())
+                    groupList.insert(result.getString(1));
+            }
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to retrieve group list");
+        }
+        return groupList;
     }
 }

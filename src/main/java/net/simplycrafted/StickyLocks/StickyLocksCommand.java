@@ -54,6 +54,19 @@ public class StickyLocksCommand implements CommandExecutor {
                             stickylocks.sendMessage(sender,"remove: Not implemented yet.", true);
                             return true;
                         case "group" :
+                            if (args.length == 1) {
+                                PlayerGroupList groupMembers = db.listGroups(playerID);
+                                if (groupMembers.isEmpty()) {
+                                    stickylocks.sendMessage(sender, "Player has no groups", true);
+                                } else {
+                                    stickylocks.sendMessage(sender, "Groups:", true);
+                                    // Show group
+                                    for (Iterator iterator = groupMembers.getIterator(); iterator.hasNext();) {
+                                        stickylocks.sendMessage(sender, iterator.next().toString(), true);
+                                    }
+                                }
+                                return true;
+                            }
                             if (args.length == 2) {
                                 // list the members of a group
                                 PlayerGroupList groupMembers = db.getGroup(playerID, args[1]);
@@ -67,7 +80,8 @@ public class StickyLocksCommand implements CommandExecutor {
                                     }
                                 }
                                 return true;
-                            } else if (args.length == 4) {
+                            }
+                            if (args.length == 4) {
                                 String error;
                                 switch (args[2]) {
                                     case "add" :
@@ -101,11 +115,10 @@ public class StickyLocksCommand implements CommandExecutor {
                                         stickylocks.sendMessage(sender,"Unknown sub-command for group",true);
                                         return false;
                                 }
-                            } else {
-                                // wrong number of arguments for group
-                                stickylocks.sendMessage(sender,"Wrong number of arguments",true);
-                                return false;
                             }
+                            // wrong number of arguments for group
+                            stickylocks.sendMessage(sender,"Wrong number of arguments",true);
+                            return false;
                         case "info" :
                             stickylocks.sendMessage(sender,"info: Not implemented yet.", true);
                             return true;
