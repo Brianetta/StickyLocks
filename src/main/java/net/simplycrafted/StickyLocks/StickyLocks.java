@@ -70,10 +70,8 @@ public class StickyLocks extends JavaPlugin {
         return stickylocks;
     }
 
-    public void sendMessage(CommandSender player, String message, boolean locked) {
-        if (locked)
-            player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"),ChatColor.DARK_RED,message));
-        else
-            player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"),ChatColor.DARK_GREEN,message));
+    public void sendMessage(CommandSender player, String message, boolean unlocked) {
+        // "unlocked" is a colour flag. If true, message is green. If not, message is red.
+        player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED,message));
     }
 }

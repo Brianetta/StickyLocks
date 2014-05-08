@@ -55,12 +55,12 @@ public class StickyLocksClick implements Listener {
                     }
                     if (protection.isProtected())
                         if (protection.getOwner().equals(player.getUniqueId()))
-                            stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), false);
+                            stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
                         else
-                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(),selected), !player.hasPermission("stickylocks.locksmith"));
+                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(),selected), player.hasPermission("stickylocks.locksmith"));
                             // Use of permission on previous line changes colour of message
                     else
-                        stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(),selected), false);
+                        stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(),selected), true);
                 }
                 event.setCancelled(true);
             } else {
@@ -68,9 +68,9 @@ public class StickyLocksClick implements Listener {
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected()) {
                     if (protection.getOwner().equals(player.getUniqueId())) {
-                        stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), false);
+                        stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
                     } else {
-                        stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), !player.hasPermission("stickylocks.ghost"));
+                        stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.ghost"));
                         // Use of permission on previous line changes colour of message
                     }
                 }
@@ -87,17 +87,17 @@ public class StickyLocksClick implements Listener {
                             Protection protection = db.getProtection(target);
                             if (protection.isProtected()) {
                                 if (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("stickylocks.locksmith")) {
-                                    stickylocks.sendMessage(player,"Unlocking...",false);
+                                    stickylocks.sendMessage(player,"Unlocking...",true);
                                     db.unlockBlock(target);
                                 } else {
                                     stickylocks.sendMessage(player,"You do not own this object",true);
                                 }
                             } else if (protection.getType() != null) {
-                                stickylocks.sendMessage(player,"Locking...",false);
+                                stickylocks.sendMessage(player,"Locking...",true);
                                 db.lockBlock(target,player);
                             }
                         } else {
-                            stickylocks.sendMessage(player,"You don't have permission to lock or unlock objects",true);
+                            stickylocks.sendMessage(player,"You don't have permission to lock or unlock objects",false);
                         }
                     }
                     event.setCancelled(true);
@@ -106,12 +106,12 @@ public class StickyLocksClick implements Listener {
                 // Pressure plate action
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected())
-                    stickylocks.sendMessage(player,String.format("%s owned by %s", protection.getType(), protection.getOwnerName()),true);
+                    stickylocks.sendMessage(player,String.format("%s owned by %s", protection.getType(), protection.getOwnerName()),false);
             } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 if (player.getItemInHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
                     // Player right-clicked nothing - Deselect whatever might be selected.
                     stickylocks.SelectedBlock.remove(player);
-                    stickylocks.sendMessage(player,"Selection cleared",false);
+                    stickylocks.sendMessage(player, "Selection cleared", true);
                 }
             }
         }

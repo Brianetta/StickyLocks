@@ -276,7 +276,7 @@ public class Database {
     }
 
     public PlayerGroupList getGroup(UUID owner, String name) {
-        PlayerGroupList groupList = new PlayerGroupList();
+        PlayerGroupList groupList = new PlayerGroupList(owner);
         PreparedStatement psql;
         ResultSet result;
         try {
@@ -332,7 +332,7 @@ public class Database {
     }
 
     public PlayerGroupList listGroups(UUID owner) {
-        PlayerGroupList groupList = new PlayerGroupList();
+        PlayerGroupList groupList = new PlayerGroupList(owner);
         PreparedStatement psql;
         ResultSet result;
         try {
@@ -349,5 +349,24 @@ public class Database {
             stickylocks.getLogger().info("Failed to retrieve group list");
         }
         return groupList;
+    }
+
+    public String getName(UUID player) {
+        PreparedStatement psql;
+        ResultSet result;
+        String returnVal = null;
+        try {
+            psql = db_conn.prepareStatement("SELECT name FROM player WHERE uuid LIKE ?");
+            psql.setString(1,player.toString());
+            result = psql.executeQuery();
+            if (result.next()) {
+                returnVal = result.getString(1);
+            }
+            result.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to get UUID from name");
+        }
+        return returnVal;
     }
 }

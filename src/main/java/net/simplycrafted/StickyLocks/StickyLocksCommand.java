@@ -45,10 +45,10 @@ public class StickyLocksCommand implements CommandExecutor {
                 if (args.length > 0) {
                     switch (args[0].toLowerCase()) {
                         case "show" :
-                            stickylocks.sendMessage(sender,"show: Not implemented yet.", true);
+                            stickylocks.sendMessage(sender,"show: Not implemented yet.", false);
                             return true;
                         case "add" :
-                            stickylocks.sendMessage(sender,"add: Not implemented yet.", true);
+                            stickylocks.sendMessage(sender,"add: Not implemented yet.", false);
                             return true;
                         case "remove" :
                             stickylocks.sendMessage(sender,"remove: Not implemented yet.", true);
@@ -57,12 +57,13 @@ public class StickyLocksCommand implements CommandExecutor {
                             if (args.length == 1) {
                                 PlayerGroupList groupMembers = db.listGroups(playerID);
                                 if (groupMembers.isEmpty()) {
-                                    stickylocks.sendMessage(sender, "Player has no groups", true);
+                                    stickylocks.sendMessage(sender, String.format("Player %s has no groups",db.getName(playerID)), false);
                                 } else {
-                                    stickylocks.sendMessage(sender, "Groups:", true);
+                                    Boolean colourFlag = playerID.equals(((Player) sender).getUniqueId());
+                                    stickylocks.sendMessage(sender, String.format("Groups for %s:", db.getName(playerID)), colourFlag);
                                     // Show group
                                     for (Iterator iterator = groupMembers.getIterator(); iterator.hasNext();) {
-                                        stickylocks.sendMessage(sender, iterator.next().toString(), true);
+                                        stickylocks.sendMessage(sender, iterator.next().toString(), colourFlag);
                                     }
                                 }
                                 return true;
@@ -71,12 +72,13 @@ public class StickyLocksCommand implements CommandExecutor {
                                 // list the members of a group
                                 PlayerGroupList groupMembers = db.getGroup(playerID, args[1]);
                                 if (groupMembers.isEmpty()) {
-                                    stickylocks.sendMessage(sender, String.format("Group %s is empty", args[1]), true);
+                                    stickylocks.sendMessage(sender, String.format("Group \"%s\" (%s) is empty", args[1], db.getName(playerID)), false);
                                 } else {
-                                    stickylocks.sendMessage(sender, String.format("Members of group %s:", args[1]), true);
+                                    Boolean colourFlag = playerID.equals(((Player) sender).getUniqueId());
+                                    stickylocks.sendMessage(sender, String.format("Members of group \"%s\" (%s):", args[1], db.getName(playerID)), colourFlag);
                                     // Show group
                                     for (Iterator iterator = groupMembers.getIterator(); iterator.hasNext();) {
-                                        stickylocks.sendMessage(sender, iterator.next().toString(), true);
+                                        stickylocks.sendMessage(sender, iterator.next().toString(), colourFlag);
                                     }
                                 }
                                 return true;
@@ -88,39 +90,39 @@ public class StickyLocksCommand implements CommandExecutor {
                                         // add player to group
                                         error = db.addPlayerToGroup(playerID,args[1],args[3]);
                                         if (error == null) {
-                                            stickylocks.sendMessage(sender,String.format("Added %s to group %s",args[3],args[1]),false);
+                                            stickylocks.sendMessage(sender,String.format("Added %s to group %s",args[3],args[1]),true);
                                         } else {
-                                            stickylocks.sendMessage(sender,error,true);
+                                            stickylocks.sendMessage(sender,error,false);
                                         }
                                         return true;
                                     case "remove" :
                                         // remove player from group
                                         error = db.removePlayerFromGroup(playerID,args[1], args[3]);
                                         if (error == null) {
-                                            stickylocks.sendMessage(sender,String.format("Removed %s from group %s",args[3],args[1]),false);
+                                            stickylocks.sendMessage(sender,String.format("Removed %s from group %s",args[3],args[1]),true);
                                         } else {
-                                            stickylocks.sendMessage(sender,error,true);
+                                            stickylocks.sendMessage(sender,error,false);
                                         }
                                         return true;
                                     case "rename" :
                                         // rename group
                                         error = db.renameGroup(playerID,args[1], args[3]);
                                         if (error == null) {
-                                            stickylocks.sendMessage(sender,String.format("Renamed group %s to %s",args[1],args[3]),false);
+                                            stickylocks.sendMessage(sender,String.format("Renamed group %s to %s",args[1],args[3]),true);
                                         } else {
-                                            stickylocks.sendMessage(sender,error,true);
+                                            stickylocks.sendMessage(sender,error,false);
                                         }
                                         return true;
                                     default :
-                                        stickylocks.sendMessage(sender,"Unknown sub-command for group",true);
+                                        stickylocks.sendMessage(sender,"Unknown sub-command for group",false);
                                         return false;
                                 }
                             }
                             // wrong number of arguments for group
-                            stickylocks.sendMessage(sender,"Wrong number of arguments",true);
+                            stickylocks.sendMessage(sender,"Wrong number of arguments",false);
                             return false;
                         case "info" :
-                            stickylocks.sendMessage(sender,"info: Not implemented yet.", true);
+                            stickylocks.sendMessage(sender,"info: Not implemented yet.", false);
                             return true;
                         default:
                             return false;
@@ -128,7 +130,7 @@ public class StickyLocksCommand implements CommandExecutor {
                 }
             } else {
                 // Commands that can also be run from console
-                stickylocks.sendMessage(sender,"This doesn't work from console yet.", true);
+                stickylocks.sendMessage(sender,"This doesn't work from console yet.", false);
                 return true;
             }
         }
