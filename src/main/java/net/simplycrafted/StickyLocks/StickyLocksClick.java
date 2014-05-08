@@ -37,7 +37,6 @@ public class StickyLocksClick implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-
         Block target = event.getClickedBlock();
         Player player = event.getPlayer();
         //if target.getType() ...check it's a protectable block type
@@ -47,7 +46,7 @@ public class StickyLocksClick implements Listener {
                 // Stick used - initiate locking, or present actions for locked item
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
-                    String selected="";
+                    String selected = "";
                     if (stickylocks.SelectedBlock.get(player) == null || !(stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
                         // Block is not one previously selected
                         stickylocks.SelectedBlock.put(player, target.getLocation());
@@ -57,10 +56,10 @@ public class StickyLocksClick implements Listener {
                         if (protection.getOwner().equals(player.getUniqueId()))
                             stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
                         else
-                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(),selected), player.hasPermission("stickylocks.locksmith"));
-                            // Use of permission on previous line changes colour of message
+                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(), selected), player.hasPermission("stickylocks.locksmith"));
+                        // Use of permission on previous line changes colour of message
                     else
-                        stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(),selected), true);
+                        stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(), selected), true);
                 }
                 event.setCancelled(true);
             } else {
@@ -72,52 +71,55 @@ public class StickyLocksClick implements Listener {
                     } else {
                         stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.ghost"));
                         // Use of permission on previous line changes colour of message
+                        if (!player.hasPermission("stickylocks.locksmith") || db.accessDenied(player, target)) {
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }
-        } else {
-            // Player is interacting in some other way
-            if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                // Left-clicks are either with a stick, or not
-                if (player.getItemInHand().getType() == tool) {
-                    // Stick used - check if it's the selected block, and lock/unlock if appropriate
-                    if (stickylocks.SelectedBlock.get(player) != null && stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1) {
-                        // Just left-clicked the selected block with a stick!
-                        if (player.hasPermission("stickylocks.lock")) {
-                            Protection protection = db.getProtection(target);
-                            if (protection.isProtected()) {
-                                if (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("stickylocks.locksmith")) {
-                                    stickylocks.sendMessage(player,"Unlocking...",true);
-                                    db.unlockBlock(target);
-                                } else {
-                                    stickylocks.sendMessage(player,"You do not own this object",true);
-                                }
-                            } else if (protection.getType() != null) {
-                                stickylocks.sendMessage(player,"Locking...",true);
-                                db.lockBlock(target,player);
+        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            // Left-clicks are either with a stick, or not
+            if (player.getItemInHand().getType() == tool) {
+                // Stick used - check if it's the selected block, and lock/unlock if appropriate
+                if (stickylocks.SelectedBlock.get(player) != null && stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1) {
+                    // Just left-clicked the selected block with a stick!
+                    if (player.hasPermission("stickylocks.lock")) {
+                        Protection protection = db.getProtection(target);
+                        if (protection.isProtected()) {
+                            if (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("stickylocks.locksmith")) {
+                                stickylocks.sendMessage(player, "Unlocking...", true);
+                                db.unlockBlock(target);
+                            } else {
+                                stickylocks.sendMessage(player, "You do not own this object", true);
                             }
-                        } else {
-                            stickylocks.sendMessage(player,"You don't have permission to lock or unlock objects",false);
+                        } else if (protection.getType() != null) {
+                            stickylocks.sendMessage(player, "Locking...", true);
+                            db.lockBlock(target, player);
                         }
+                    } else {
+                        stickylocks.sendMessage(player, "You don't have permission to lock or unlock objects", false);
                     }
-                    event.setCancelled(true);
                 }
-            } else if (event.getAction() == Action.PHYSICAL) {
-                // Pressure plate action
-                Protection protection = db.getProtection(target);
-                if (protection.isProtected())
-                    if (protection.isProtected())
-                        if (protection.getOwner().equals(player.getUniqueId()))
-                            stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
-                        else
-                            stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.locksmith"));
-                // Use of permission on previous line changes colour of message
-            } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-                if (player.getItemInHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
-                    // Player right-clicked nothing - Deselect whatever might be selected.
-                    stickylocks.SelectedBlock.remove(player);
-                    stickylocks.sendMessage(player, "Selection cleared", true);
+                event.setCancelled(true);
+            }
+        } else if (event.getAction() == Action.PHYSICAL) {
+            // Pressure plate action
+            Protection protection = db.getProtection(target);
+            if (protection.isProtected())
+                if (protection.getOwner().equals(player.getUniqueId())) {
+                    stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
+                } else {
+                    stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.locksmith"));
+                    // Use of permission on previous line changes colour of message
+                    if (!player.hasPermission("stickylocks.locksmith") || db.accessDenied(player, target)) {
+                        event.setCancelled(true);
+                    }
                 }
+        } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+            if (player.getItemInHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
+                // Player right-clicked nothing - Deselect whatever might be selected.
+                stickylocks.SelectedBlock.remove(player);
+                stickylocks.sendMessage(player, "Selection cleared", true);
             }
         }
     }

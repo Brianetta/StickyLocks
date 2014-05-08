@@ -1,6 +1,5 @@
 package net.simplycrafted.StickyLocks;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -425,10 +424,9 @@ public class Database {
                 String.format("Added PLAYER %s to access list", arg);
     }
 
-    public String removePlayerOrGroupFromACL(Location blockLocation, UUID owner, String arg) {
+    public String removePlayerOrGroupFromACL(Location blockLocation, String arg) {
         Location location = getUnambiguousLocation(blockLocation.getBlock());
         PreparedStatement psql;
-        ResultSet results;
         if (location == null) {
             return null;
         }
@@ -507,5 +505,35 @@ public class Database {
             stickylocks.getLogger().info("Failed to determine information about block");
         }
         return accessDetails;
+    }
+
+    public boolean accessDenied(Player player, Block target) {
+        PreparedStatement psql;
+        ResultSet results;
+        Location location = getUnambiguousLocation(target);
+        String playerUUID = player.getUniqueId().toString();
+        try {
+            psql = db_conn.prepareStatement("SELECT count(*) FROM protectable " +
+                    "LEFT JOIN protected ON protectable.material=protected.material " +
+                    "LEFT JOIN accesslist ON protected.x=accesslist.x " +
+                                        "AND protected.y=accesslist.y " +
+                                        "AND protected.z=accesslist.z " +
+                                        "AND protected.world=accesslist.world " +
+                    "LEFT JOIN accessgroup ON accesslist.member=accessgroup.name " +
+                    "WHERE protected.x=? AND protected.y=? AND protected.z=? AND protected.world LIKE ? " +
+                    "AND (accesslist.member LIKE ? OR accessgroup.member LIKE ? OR owner LIKE ?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            psql.setString(5, playerUUID);
+            psql.setString(6, playerUUID);
+            psql.setString(7, playerUUID);
+            results = psql.executeQuery();
+            return results.next() && (results.getInt(1) > 0);
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to check access for block");
+        }
+        return false;
     }
 }

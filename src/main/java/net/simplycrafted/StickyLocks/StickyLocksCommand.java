@@ -91,7 +91,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             } else if (args.length > 1) {
                                 if (playerID.equals(((Player) sender).getUniqueId()) || sender.hasPermission("stickylocks.locksmith")) {
                                     for (int i = 1, argsLength = args.length; i < argsLength; i++) {
-                                        message = db.removePlayerOrGroupFromACL(location, playerID, args[i]);
+                                        message = db.removePlayerOrGroupFromACL(location, args[i]);
                                         if (message == null) {
                                             stickylocks.sendMessage(sender, String.format("Failed to remove %s from access list (check spelling)", args[i]), false);
                                         } else {
