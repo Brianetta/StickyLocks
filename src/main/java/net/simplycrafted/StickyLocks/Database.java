@@ -374,7 +374,8 @@ public class Database {
         return returnVal;
     }
 
-    public String addPlayerOrGroupToACL(Location location, UUID owner, String arg) {
+    public String addPlayerOrGroupToACL(Location blockLocation, UUID owner, String arg) {
+        Location location = getUnambiguousLocation(blockLocation.getBlock());
         PreparedStatement psql;
         ResultSet results;
         Boolean useGroup = false;
@@ -424,7 +425,8 @@ public class Database {
                 String.format("Added PLAYER %s to access list", arg);
     }
 
-    public String removePlayerOrGroupFromACL(Location location, UUID owner, String arg) {
+    public String removePlayerOrGroupFromACL(Location blockLocation, UUID owner, String arg) {
+        Location location = getUnambiguousLocation(blockLocation.getBlock());
         PreparedStatement psql;
         ResultSet results;
         if (location == null) {
@@ -447,5 +449,63 @@ public class Database {
         }
         // Caller uses non-null return string to indicate success, and sends it on.
         return String.format("Removed %s from access list", arg);
+    }
+
+    public List<String> getAccess(Location blockLocation) {
+        Location location = getUnambiguousLocation(blockLocation.getBlock());
+        List<String> accessDetails = new ArrayList<>();
+        PreparedStatement psql;
+        ResultSet results;
+        if (location == null) {
+            return null;
+        }
+        try {
+            // First, attempt to list the owner
+            psql = db_conn.prepareStatement("SELECT name FROM protected INNER JOIN player ON owner=uuid " +
+                    "WHERE x=? AND y=? AND z=? AND world LIKE ?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            results = psql.executeQuery();
+            if (results.next()) {
+                accessDetails.add(String.format("Owner of block at (%s,%s,%s) is %s",
+                        location.getBlockX(),
+                        location.getBlockY(),
+                        location.getBlockZ(),
+                        results.getString(1)));
+            }
+            results.close();
+            psql.close();
+            // Next, attempt to list the groups
+            psql = db_conn.prepareStatement("SELECT member FROM accesslist LEFT JOIN player ON member=uuid " +
+                    "WHERE x=? AND y=? AND z=? AND world LIKE ? AND player.uuid IS NULL");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            results = psql.executeQuery();
+            while (results.next()) {
+                accessDetails.add(String.format("Group with access: %s", results.getString(1)));
+            }
+            results.close();
+            psql.close();
+            // Next, attempt to list the players
+            psql = db_conn.prepareStatement("SELECT name FROM accesslist INNER JOIN player ON member=uuid " +
+                    "WHERE x=? AND y=? AND z=? AND world LIKE ?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            results = psql.executeQuery();
+            while (results.next()) {
+                accessDetails.add(String.format("Player with access: %s", results.getString(1)));
+            }
+            results.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to determine information about block");
+        }
+        return accessDetails;
     }
 }

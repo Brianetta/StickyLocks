@@ -49,7 +49,21 @@ public class StickyLocksCommand implements CommandExecutor {
                 if (args.length > 0) {
                     switch (args[0].toLowerCase()) {
                         case "show" :
-                            stickylocks.sendMessage(sender,"show: Not implemented yet.", false);
+                            if (location == null) {
+                                stickylocks.sendMessage(sender, String.format("You must select a block first (right-click with %s)", stickylocks.getConfig().getString("tool")), false);
+                            } else {
+                                Boolean playerHasAccess = playerID.equals(((Player) sender).getUniqueId()) || sender.hasPermission("stickylocks.locksmith");
+                                stickylocks.sendMessage(sender, "Access details for selected block:", playerHasAccess);
+                                List<String> accessInfo = db.getAccess(location);
+                                if (accessInfo.isEmpty()) {
+                                    stickylocks.sendMessage(sender, "Block is unowned", true);
+                                } else {
+                                    // Show details
+                                    for (String accessLine : accessInfo) {
+                                        stickylocks.sendMessage(sender, accessLine, playerHasAccess);
+                                    }
+                                }
+                            }
                             return true;
                         case "add" :
                             if (location == null) {
