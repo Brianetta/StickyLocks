@@ -3,7 +3,6 @@ package net.simplycrafted.StickyLocks;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Copyright © Brian Ronald
@@ -25,7 +24,7 @@ public class PlayerGroupList {
 
     private List<String> groupList;
 
-    public PlayerGroupList(UUID uuid) {
+    public PlayerGroupList() {
         groupList = new ArrayList<String>();
     }
 

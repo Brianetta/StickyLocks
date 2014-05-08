@@ -276,7 +276,7 @@ public class Database {
     }
 
     public PlayerGroupList getGroup(UUID owner, String name) {
-        PlayerGroupList groupList = new PlayerGroupList(owner);
+        PlayerGroupList groupList = new PlayerGroupList();
         PreparedStatement psql;
         ResultSet result;
         try {
@@ -332,7 +332,7 @@ public class Database {
     }
 
     public PlayerGroupList listGroups(UUID owner) {
-        PlayerGroupList groupList = new PlayerGroupList(owner);
+        PlayerGroupList groupList = new PlayerGroupList();
         PreparedStatement psql;
         ResultSet result;
         try {
