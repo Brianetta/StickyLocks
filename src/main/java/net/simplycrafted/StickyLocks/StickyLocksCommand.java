@@ -121,37 +121,41 @@ public class StickyLocksCommand implements CommandExecutor {
                                 }
                                 return true;
                             }
-                            if (args.length == 4) {
+                            if (args.length > 3) {
                                 String error;
                                 if (playerID.equals(((Player) sender).getUniqueId()) || sender.hasPermission("stickylocks.locksmith")) {
                                     switch (args[2]) {
-                                        case "add" :
-                                            // add player to group
-                                            error = db.addPlayerToGroup(playerID,args[1],args[3]);
-                                            if (error == null) {
-                                                stickylocks.sendMessage(sender,String.format("Added %s to group %s",args[3],args[1]),true);
-                                            } else {
-                                                stickylocks.sendMessage(sender,error,false);
+                                        case "add":
+                                            for (int i = 3, argsLength = args.length; i < argsLength; i++) {
+                                                // add player to group
+                                                error = db.addPlayerToGroup(playerID, args[1], args[i]);
+                                                if (error == null) {
+                                                    stickylocks.sendMessage(sender, String.format("Added %s to group %s", args[i], args[1]), true);
+                                                } else {
+                                                    stickylocks.sendMessage(sender, error, false);
+                                                }
                                             }
                                             return true;
-                                        case "remove" :
-                                            // remove player from group
-                                            error = db.removePlayerFromGroup(playerID,args[1], args[3]);
-                                            if (error == null) {
-                                                stickylocks.sendMessage(sender,String.format("Removed %s from group %s",args[3],args[1]),true);
-                                            } else {
-                                                stickylocks.sendMessage(sender,error,false);
+                                        case "remove":
+                                            for (int i = 3, argsLength = args.length; i < argsLength; i++) {
+                                                // remove player from group
+                                                error = db.removePlayerFromGroup(playerID, args[1], args[i]);
+                                                if (error == null) {
+                                                    stickylocks.sendMessage(sender, String.format("Removed %s from group %s", args[i], args[1]), true);
+                                                } else {
+                                                    stickylocks.sendMessage(sender, error, false);
+                                                }
                                             }
                                             return true;
-                                        case "rename" :
+                                        case "rename":
                                             // rename group
-                                            db.renameGroup(playerID,args[1], args[3]);
-                                            stickylocks.sendMessage(sender,String.format("Blindly renaming group %s to %s",args[1],args[3]),true);
+                                            db.renameGroup(playerID, args[1], args[3]);
+                                            stickylocks.sendMessage(sender, String.format("Blindly renaming group %s to %s", args[1], args[3]), true);
                                             return true;
-                                        default :
-                                            stickylocks.sendMessage(sender,"Unknown sub-command for group",false);
+                                        default:
+                                            stickylocks.sendMessage(sender, "Unknown sub-command for group", false);
                                             return false;
-                                    }
+                                }
                                 } else {
                                     stickylocks.sendMessage(sender, "You cannot alter another player's groups", false);
                                     return true;
