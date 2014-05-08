@@ -32,6 +32,8 @@ public class StickyLocksCommand implements CommandExecutor {
         if (command.getName().equals("stickylocks")) {
             if (sender instanceof Player) {
                 UUID playerID;
+                String message;
+                Location location = null;
 
                 // If a block is selected, use that block's owner. If that block has no owner, or
                 // if no block is selected, use the player.
@@ -40,18 +42,19 @@ public class StickyLocksCommand implements CommandExecutor {
                 } else {
                     playerID = db.getUUID(stickylocks.SelectedBlock.get(sender));
                     if (playerID == null) playerID = ((Player) sender).getUniqueId();
+                    location = stickylocks.SelectedBlock.get(sender);
                 }
 
-                    // Player-specific commands
+                // Player-specific commands
                 if (args.length > 0) {
                     switch (args[0].toLowerCase()) {
                         case "show" :
                             stickylocks.sendMessage(sender,"show: Not implemented yet.", false);
                             return true;
                         case "add" :
-                            String message;
-                            Location location = stickylocks.SelectedBlock.get(sender);
-                            if (args.length > 1) {
+                            if (location == null) {
+                                stickylocks.sendMessage(sender, String.format("You must select a block first (right-click with %s)",stickylocks.getConfig().getString("tool")), false);
+                            } else if (args.length > 1) {
                                 for (int i = 1, argsLength = args.length; i < argsLength; i++) {
                                     message = db.addPlayerOrGroupToACL(location, playerID, args[i]);
                                     if (message == null) {
@@ -65,7 +68,20 @@ public class StickyLocksCommand implements CommandExecutor {
                             }
                             return true;
                         case "remove" :
-                            stickylocks.sendMessage(sender,"remove: Not implemented yet.", true);
+                            if (location == null) {
+                                stickylocks.sendMessage(sender, String.format("You must select a block first (right-click with %s)",stickylocks.getConfig().getString("tool")), false);
+                            } else if (args.length > 1) {
+                                for (int i = 1, argsLength = args.length; i < argsLength; i++) {
+                                    message = db.removePlayerOrGroupFromACL(location, playerID, args[i]);
+                                    if (message == null) {
+                                        stickylocks.sendMessage(sender, String.format("Failed to remove %s from access list (check spelling)", args[i]), false);
+                                    } else {
+                                        stickylocks.sendMessage(sender, message, true);
+                                    }
+                                }
+                            }else{
+                                stickylocks.sendMessage(sender, "Please specify players or groups", false);
+                            }
                             return true;
                         case "group" :
                             if (args.length == 1) {

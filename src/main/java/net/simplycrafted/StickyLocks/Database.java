@@ -378,6 +378,9 @@ public class Database {
         PreparedStatement psql;
         ResultSet results;
         Boolean useGroup = false;
+        if (location == null) {
+            return null;
+        }
         try {
             psql = db_conn.prepareStatement("SELECT count(*) FROM accessgroup WHERE owner LIKE ? AND name LIKE ?" +
                     " UNION ALL " +
@@ -419,5 +422,30 @@ public class Database {
         // Caller uses non-null return string to indicate success, and sends it on.
         return useGroup ? String.format("Added GROUP %s to access list", arg) :
                 String.format("Added PLAYER %s to access list", arg);
+    }
+
+    public String removePlayerOrGroupFromACL(Location location, UUID owner, String arg) {
+        PreparedStatement psql;
+        ResultSet results;
+        if (location == null) {
+            return null;
+        }
+        try {
+            // Delete any player or group from the ACL by name
+            psql = db_conn.prepareStatement("DELETE FROM accesslist WHERE x=? AND y=? AND z=? AND world like ? AND " +
+                    "(member LIKE ? OR member LIKE (SELECT uuid FROM player WHERE name LIKE ?))");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            psql.setString(5, arg);
+            psql.setString(6, arg);
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to remove item from ACL");
+        }
+        // Caller uses non-null return string to indicate success, and sends it on.
+        return String.format("Removed %s from access list", arg);
     }
 }
