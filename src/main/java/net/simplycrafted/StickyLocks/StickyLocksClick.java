@@ -109,8 +109,6 @@ public class StickyLocksClick implements Listener {
                 if (protection.getOwner().equals(player.getUniqueId())) {
                     stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
                 } else {
-                    stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.locksmith"));
-                    // Use of permission on previous line changes colour of message
                     if (!player.hasPermission("stickylocks.locksmith") || db.accessDenied(player, target)) {
                         event.setCancelled(true);
                     }
