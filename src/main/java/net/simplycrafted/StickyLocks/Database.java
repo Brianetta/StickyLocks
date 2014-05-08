@@ -1,5 +1,6 @@
 package net.simplycrafted.StickyLocks;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -59,7 +60,7 @@ public class Database {
             sql.executeUpdate("CREATE TABLE protectable (material text primary key)");
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS protected (x integer, y integer, z integer, world text, material text, owner char(36),PRIMARY KEY (x,y,z,world))");
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS accessgroup (owner char(36),name text,member char(36),PRIMARY KEY (owner,name,member))");
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS accesslist (owner char(36),member text,x integer,y integer,z integer,world text)");
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS accesslist (member text,x integer,y integer,z integer,world text,PRIMARY KEY (x,y,z,world,member))");
             sql.close();
             // Load values for protectable blocks from the config
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
@@ -221,6 +222,7 @@ public class Database {
             if (result.next()) {
                 memberUUID = result.getString(1);
             } else {
+                // Caller uses non-null return string to indicate failure, and sends it on.
                 return String.format("Player %s is not known", member);
             }
             result.close();
@@ -247,6 +249,7 @@ public class Database {
             if (result.next()) {
                 memberUUID = result.getString(1);
             } else {
+                // Caller uses non-null return string to indicate failure, and sends it on.
                 return String.format("Player %s is not known", member);
             }
             result.close();
@@ -262,7 +265,7 @@ public class Database {
         return null;
     }
 
-    public String renameGroup(UUID owner, String group, String newName) {
+    public void renameGroup(UUID owner, String group, String newName) {
         PreparedStatement psql;
         try {
             psql = db_conn.prepareStatement("UPDATE accessgroup SET name=? WHERE owner=? AND name LIKE ?");
@@ -274,7 +277,6 @@ public class Database {
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to remove group member");
         }
-        return null;
     }
 
     public List<String> getGroup(UUID owner, String name) {
@@ -370,5 +372,52 @@ public class Database {
             stickylocks.getLogger().info("Failed to get UUID from name");
         }
         return returnVal;
+    }
+
+    public String addPlayerOrGroupToACL(Location location, UUID owner, String arg) {
+        PreparedStatement psql;
+        ResultSet results;
+        Boolean useGroup = false;
+        try {
+            psql = db_conn.prepareStatement("SELECT count(*) FROM accessgroup WHERE owner LIKE ? AND name LIKE ?" +
+                    " UNION ALL " +
+                    "SELECT count(*) FROM player WHERE name LIKE ?");
+            psql.setString(1, owner.toString());
+            psql.setString(2, arg);
+            psql.setString(3, arg);
+            results = psql.executeQuery();
+            if (results.next() && results.getInt(1) > 0) {
+                // A group exists by this name with this owner; we'll use group names first
+                useGroup = true;
+            } else if (results.next() && results.getInt(1) == 0) {
+                // no group exists, but neither is there a player of that name
+                results.close();
+                psql.close();
+                return null;
+            }
+            results.close();
+            psql.close();
+            if (useGroup) {
+                // Insert a group into the ACL by name
+                psql = db_conn.prepareStatement("REPLACE INTO accesslist (x, y, z, world, member) VALUES (?,?,?,?,?)");
+            } else {
+                // Insert a player into the ACL by UUID, using subquery
+                psql = db_conn.prepareStatement("REPLACE INTO accesslist (x, y, z, world, member) VALUES (?,?,?,?,(" +
+                        "SELECT uuid FROM player WHERE name LIKE ?" +
+                        "))");
+            }
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            psql.setString(5, arg);
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to add item to ACL");
+        }
+        // Caller uses non-null return string to indicate success, and sends it on.
+        return useGroup ? String.format("Added GROUP %s to access list", arg) :
+                String.format("Added PLAYER %s to access list", arg);
     }
 }

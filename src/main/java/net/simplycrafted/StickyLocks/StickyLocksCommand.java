@@ -1,5 +1,6 @@
 package net.simplycrafted.StickyLocks;
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -48,7 +49,20 @@ public class StickyLocksCommand implements CommandExecutor {
                             stickylocks.sendMessage(sender,"show: Not implemented yet.", false);
                             return true;
                         case "add" :
-                            stickylocks.sendMessage(sender,"add: Not implemented yet.", false);
+                            String message;
+                            Location location = stickylocks.SelectedBlock.get(sender);
+                            if (args.length > 1) {
+                                for (int i = 1, argsLength = args.length; i < argsLength; i++) {
+                                    message = db.addPlayerOrGroupToACL(location, playerID, args[i]);
+                                    if (message == null) {
+                                        stickylocks.sendMessage(sender, String.format("Failed to add %s to access list (check spelling)", args[i]), false);
+                                    } else {
+                                        stickylocks.sendMessage(sender, message, true);
+                                    }
+                                }
+                            }else{
+                                stickylocks.sendMessage(sender, "Please specify players or groups", false);
+                            }
                             return true;
                         case "remove" :
                             stickylocks.sendMessage(sender,"remove: Not implemented yet.", true);
@@ -106,12 +120,8 @@ public class StickyLocksCommand implements CommandExecutor {
                                         return true;
                                     case "rename" :
                                         // rename group
-                                        error = db.renameGroup(playerID,args[1], args[3]);
-                                        if (error == null) {
-                                            stickylocks.sendMessage(sender,String.format("Renamed group %s to %s",args[1],args[3]),true);
-                                        } else {
-                                            stickylocks.sendMessage(sender,error,false);
-                                        }
+                                        db.renameGroup(playerID,args[1], args[3]);
+                                        stickylocks.sendMessage(sender,String.format("Blindly renaming group %s to %s",args[1],args[3]),true);
                                         return true;
                                     default :
                                         stickylocks.sendMessage(sender,"Unknown sub-command for group",false);
