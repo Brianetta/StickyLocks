@@ -5,7 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -55,30 +55,30 @@ public class StickyLocksCommand implements CommandExecutor {
                             return true;
                         case "group" :
                             if (args.length == 1) {
-                                PlayerGroupList groupMembers = db.listGroups(playerID);
+                                List<String> groupMembers = db.listGroups(playerID);
                                 if (groupMembers.isEmpty()) {
                                     stickylocks.sendMessage(sender, String.format("Player %s has no groups",db.getName(playerID)), false);
                                 } else {
                                     Boolean colourFlag = playerID.equals(((Player) sender).getUniqueId());
                                     stickylocks.sendMessage(sender, String.format("Groups for %s:", db.getName(playerID)), colourFlag);
                                     // Show group
-                                    for (Iterator iterator = groupMembers.getIterator(); iterator.hasNext();) {
-                                        stickylocks.sendMessage(sender, iterator.next().toString(), colourFlag);
+                                    for (String groupMember : groupMembers) {
+                                        stickylocks.sendMessage(sender, groupMember, colourFlag);
                                     }
                                 }
                                 return true;
                             }
                             if (args.length == 2) {
                                 // list the members of a group
-                                PlayerGroupList groupMembers = db.getGroup(playerID, args[1]);
+                                List<String> groupMembers = db.getGroup(playerID, args[1]);
                                 if (groupMembers.isEmpty()) {
                                     stickylocks.sendMessage(sender, String.format("Group \"%s\" (%s) is empty", args[1], db.getName(playerID)), false);
                                 } else {
                                     Boolean colourFlag = playerID.equals(((Player) sender).getUniqueId());
                                     stickylocks.sendMessage(sender, String.format("Members of group \"%s\" (%s):", args[1], db.getName(playerID)), colourFlag);
                                     // Show group
-                                    for (Iterator iterator = groupMembers.getIterator(); iterator.hasNext();) {
-                                        stickylocks.sendMessage(sender, iterator.next().toString(), colourFlag);
+                                    for (String groupMember : groupMembers) {
+                                        stickylocks.sendMessage(sender, groupMember, colourFlag);
                                     }
                                 }
                                 return true;
@@ -125,7 +125,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             stickylocks.sendMessage(sender,"info: Not implemented yet.", false);
                             return true;
                         default:
-                            return false;
+                             return false;
                     }
                 }
             } else {

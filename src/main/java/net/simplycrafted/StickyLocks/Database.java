@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -275,8 +277,8 @@ public class Database {
         return null;
     }
 
-    public PlayerGroupList getGroup(UUID owner, String name) {
-        PlayerGroupList groupList = new PlayerGroupList();
+    public List<String> getGroup(UUID owner, String name) {
+        List<String> groupList = new ArrayList<>();
         PreparedStatement psql;
         ResultSet result;
         try {
@@ -287,7 +289,7 @@ public class Database {
             while(result.next()) {
                 result.getString(1);
                 if(!result.wasNull())
-                    groupList.insert(result.getString(1));
+                    groupList.add(result.getString(1));
             }
             psql.close();
         } catch (SQLException e) {
@@ -331,8 +333,8 @@ public class Database {
         return returnVal;
     }
 
-    public PlayerGroupList listGroups(UUID owner) {
-        PlayerGroupList groupList = new PlayerGroupList();
+    public List<String> listGroups(UUID owner) {
+        List<String> groupList = new ArrayList<>();
         PreparedStatement psql;
         ResultSet result;
         try {
@@ -342,7 +344,7 @@ public class Database {
             while(result.next()) {
                 result.getString(1);
                 if(!result.wasNull())
-                    groupList.insert(result.getString(1));
+                    groupList.add(result.getString(1));
             }
             psql.close();
         } catch (SQLException e) {
