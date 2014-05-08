@@ -148,9 +148,10 @@ public class StickyLocksCommand implements CommandExecutor {
                                             }
                                             return true;
                                         case "rename":
+                                        case "merge":
                                             // rename group
                                             db.renameGroup(playerID, args[1], args[3]);
-                                            stickylocks.sendMessage(sender, String.format("Blindly renaming group %s to %s", args[1], args[3]), true);
+                                            stickylocks.sendMessage(sender, String.format("Blindly renaming/merging group %s to %s", args[1], args[3]), true);
                                             return true;
                                         default:
                                             stickylocks.sendMessage(sender, "Unknown sub-command for group", false);
