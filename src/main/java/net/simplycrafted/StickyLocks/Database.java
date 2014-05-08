@@ -182,9 +182,15 @@ public class Database {
             psql.setInt(3, location.getBlockZ());
             psql.setString(4, location.getWorld().getName());
             psql.executeUpdate();
+            psql = db_conn.prepareStatement("DELETE FROM accesslist WHERE x=? AND y=? AND z=? AND world=?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            psql.executeUpdate();
             psql.close();
         } catch (SQLException e) {
-            stickylocks.getLogger().info("Failed to remove record to unlock block");
+            stickylocks.getLogger().info("Failed to remove records to unlock block");
         }
     }
 
