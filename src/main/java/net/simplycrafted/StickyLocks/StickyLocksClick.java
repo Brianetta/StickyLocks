@@ -106,7 +106,12 @@ public class StickyLocksClick implements Listener {
                 // Pressure plate action
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected())
-                    stickylocks.sendMessage(player,String.format("%s owned by %s", protection.getType(), protection.getOwnerName()),false);
+                    if (protection.isProtected())
+                        if (protection.getOwner().equals(player.getUniqueId()))
+                            stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
+                        else
+                            stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.locksmith"));
+                // Use of permission on previous line changes colour of message
             } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
                 if (player.getItemInHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
                     // Player right-clicked nothing - Deselect whatever might be selected.
