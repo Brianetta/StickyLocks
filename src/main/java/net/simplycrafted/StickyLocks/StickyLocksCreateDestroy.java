@@ -1,11 +1,14 @@
 package net.simplycrafted.StickyLocks;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.InventoryHolder;
 
 /**
  * Copyright © Brian Ronald
@@ -26,7 +29,7 @@ public class StickyLocksCreateDestroy implements Listener {
     private StickyLocks stickylocks = StickyLocks.getInstance();
 
     @EventHandler
-    public void onPlayerJoin(BlockPlaceEvent event) {
+    public void onBlockPlaceEvent(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {
@@ -42,7 +45,20 @@ public class StickyLocksCreateDestroy implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(BlockBreakEvent event) {
+    public void onBlockBreakEvent(BlockBreakEvent event) {
+        Block target = event.getBlock();
+        if (target.getState() instanceof Chest) {
+            // Double chests are hard to detect. Nevertheless, this will do it,
+            // and we'll warn the player that the other portion might not be locked.
+            Chest chest = (Chest) target.getState();
+            InventoryHolder ih = chest.getInventory().getHolder();
+            if (ih instanceof DoubleChest) {
+                Protection protection = db.getProtection(target);
+                if (protection.getType() != null) {
+                    stickylocks.sendMessage(event.getPlayer(), "Check lock on remaining single chest", false);
+                }
+            }
+        }
         db.unlockBlock(event.getBlock());
     }
 }
