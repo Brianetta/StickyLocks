@@ -20,7 +20,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
  */
 public class StickyLocksPlayerjoin implements Listener {
     Database db = new Database();
-    static StickyLocks stickylocks;
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

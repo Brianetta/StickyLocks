@@ -50,6 +50,9 @@ public class StickyLocks extends JavaPlugin {
         // Set up handler that detects new players joining
         getServer().getPluginManager().registerEvents(new StickyLocksPlayerjoin(),stickylocks);
 
+        // Set up handler that detects blocks being created or destroyed
+        getServer().getPluginManager().registerEvents(new StickyLocksCreateDestroy(),stickylocks);
+
         // Initialise database, and create tables if necessary
         db=new Database();
         db.createTables();
