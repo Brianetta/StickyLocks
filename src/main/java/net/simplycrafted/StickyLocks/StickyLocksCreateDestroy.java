@@ -54,7 +54,7 @@ public class StickyLocksCreateDestroy implements Listener {
             InventoryHolder ih = chest.getInventory().getHolder();
             if (ih instanceof DoubleChest) {
                 Protection protection = db.getProtection(target);
-                if (protection.getType() != null) {
+                if (protection.isProtected()) {
                     stickylocks.sendMessage(event.getPlayer(), "Check lock on remaining single chest", false);
                 }
             }
