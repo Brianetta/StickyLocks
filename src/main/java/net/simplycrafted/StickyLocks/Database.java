@@ -114,10 +114,10 @@ public class Database {
     public Protection getProtection (Block block) {
         PreparedStatement psql;
         ResultSet result;
-        Protection returnValue;
+        Protection returnValue = new Protection(block.getType(), false, null, null);
         Location location = getUnambiguousLocation(block);
         try {
-            psql = db_conn.prepareStatement("SELECT UUID,name " +
+            psql = db_conn.prepareStatement("SELECT uuid,name " +
                     "FROM protectable " +
                     "LEFT JOIN protected " +
                     "ON protectable.material=protected.material " +
@@ -126,29 +126,21 @@ public class Database {
                     "AND z=?" +
                     "AND world=? " +
                     "LEFT JOIN player " +
-                    "ON owner=UUID " +
-                    "WHERE protectable.material LIKE ?");
+                    "ON owner=uuid");
             psql.setInt(1, location.getBlockX());
             psql.setInt(2, location.getBlockY());
             psql.setInt(3, location.getBlockZ());
             psql.setString(4, block.getLocation().getWorld().getName());
-            psql.setString(5, block.getType().name());
             result = psql.executeQuery();
-            if (result.next()) {
+            while (result.next()) {
                 String owner=result.getString(1);
-                if (result.wasNull()) {
-                    returnValue = new Protection(block.getType(), false, null, null);
-                } else {
+                if (!result.wasNull()) {
                     returnValue = new Protection(block.getType(), true, owner, result.getString(2));
                 }
-                result.close();
-                psql.close();
-                return returnValue;
-            } else {
-                result.close();
-                psql.close();
-                return new Protection(null, false, null, null);
             }
+            result.close();
+            psql.close();
+            return returnValue;
         } catch (SQLException e) {
             return new Protection(null, false, null, null);
         }
