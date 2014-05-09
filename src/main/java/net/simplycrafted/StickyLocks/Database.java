@@ -527,7 +527,7 @@ public class Database {
                                         "AND protected.world=accesslist.world " +
                     "LEFT JOIN accessgroup ON accesslist.member=accessgroup.name " +
                     "WHERE protected.x=? AND protected.y=? AND protected.z=? AND protected.world LIKE ? " +
-                    "AND (accesslist.member LIKE ? OR accessgroup.member LIKE ? OR owner LIKE ?");
+                    "AND (accesslist.member LIKE ? OR accessgroup.member LIKE ? OR protected.owner LIKE ?)");
             psql.setInt(1, location.getBlockX());
             psql.setInt(2, location.getBlockY());
             psql.setInt(3, location.getBlockZ());
@@ -536,7 +536,9 @@ public class Database {
             psql.setString(6, playerUUID);
             psql.setString(7, playerUUID);
             results = psql.executeQuery();
-            return results.next() && (results.getInt(1) > 0);
+            if (results.next()) {
+                return results.getInt(1) == 0;
+            }
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to check access for block");
         }

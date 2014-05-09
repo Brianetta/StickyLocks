@@ -71,7 +71,7 @@ public class StickyLocksClick implements Listener {
                     } else {
                         stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.ghost"));
                         // Use of permission on previous line changes colour of message
-                        if (!player.hasPermission("stickylocks.locksmith") || db.accessDenied(player, target)) {
+                        if (!player.hasPermission("stickylocks.ghost") && db.accessDenied(player, target)) {
                             event.setCancelled(true);
                         }
                     }
@@ -90,7 +90,7 @@ public class StickyLocksClick implements Listener {
                                 stickylocks.sendMessage(player, "Unlocking...", true);
                                 db.unlockBlock(target);
                             } else {
-                                stickylocks.sendMessage(player, "You do not own this object", true);
+                                stickylocks.sendMessage(player, "You do not own this object", false);
                             }
                         } else if (protection.getType() != null) {
                             stickylocks.sendMessage(player, "Locking...", true);
@@ -109,7 +109,7 @@ public class StickyLocksClick implements Listener {
                 if (protection.getOwner().equals(player.getUniqueId())) {
                     stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
                 } else {
-                    if (!player.hasPermission("stickylocks.locksmith") || db.accessDenied(player, target)) {
+                    if (!player.hasPermission("stickylocks.ghost") || db.accessDenied(player, target)) {
                         event.setCancelled(true);
                     }
                 }
