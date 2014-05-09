@@ -106,9 +106,7 @@ public class StickyLocksClick implements Listener {
             // Pressure plate action
             Protection protection = db.getProtection(target);
             if (protection.isProtected())
-                if (protection.getOwner().equals(player.getUniqueId())) {
-                    stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
-                } else {
+                if (!protection.getOwner().equals(player.getUniqueId())) {
                     if (!player.hasPermission("stickylocks.ghost") || db.accessDenied(player, target)) {
                         event.setCancelled(true);
                     }
