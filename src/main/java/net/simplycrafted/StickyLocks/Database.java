@@ -380,39 +380,54 @@ public class Database {
             return null;
         }
         try {
-            psql = db_conn.prepareStatement("SELECT count(*) FROM accessgroup WHERE owner LIKE ? AND name LIKE ?" +
-                    " UNION ALL " +
-                    "SELECT count(*) FROM player WHERE name LIKE ?");
+            psql = db_conn.prepareStatement("SELECT count(*) FROM protected WHERE owner LIKE ? AND x=? AND y=? AND z=? AND world LIKE ?");
             psql.setString(1, owner.toString());
-            psql.setString(2, arg);
-            psql.setString(3, arg);
+            psql.setInt(2, location.getBlockX());
+            psql.setInt(3, location.getBlockY());
+            psql.setInt(4, location.getBlockZ());
+            psql.setString(5, location.getWorld().getName());
             results = psql.executeQuery();
             if (results.next() && results.getInt(1) > 0) {
-                // A group exists by this name with this owner; we'll use group names first
-                useGroup = true;
-            } else if (results.next() && results.getInt(1) == 0) {
-                // no group exists, but neither is there a player of that name
+                // The block is protected and owned by this player
                 results.close();
                 psql.close();
-                return null;
-            }
-            results.close();
-            psql.close();
-            if (useGroup) {
-                // Insert a group into the ACL by name
-                psql = db_conn.prepareStatement("REPLACE INTO accesslist (x, y, z, world, member) VALUES (?,?,?,?,?)");
+                psql = db_conn.prepareStatement("SELECT count(*) FROM accessgroup WHERE owner LIKE ? AND name LIKE ?" +
+                        " UNION ALL " +
+                        "SELECT count(*) FROM player WHERE name LIKE ?");
+                psql.setString(1, owner.toString());
+                psql.setString(2, arg);
+                psql.setString(3, arg);
+                results = psql.executeQuery();
+                if (results.next() && results.getInt(1) > 0) {
+                    // A group exists by this name with this owner; we'll use group names first
+                    useGroup = true;
+                } else if (results.next() && results.getInt(1) == 0) {
+                    // no group exists, but neither is there a player of that name
+                    results.close();
+                    psql.close();
+                    return null;
+                }
+                results.close();
+                psql.close();            if (useGroup) {
+                    // Insert a group into the ACL by name
+                    psql = db_conn.prepareStatement("REPLACE INTO accesslist (x, y, z, world, member) VALUES (?,?,?,?,?)");
+                } else {
+                    // Insert a player into the ACL by UUID, using subquery
+                    psql = db_conn.prepareStatement("REPLACE INTO accesslist (x, y, z, world, member) VALUES (?,?,?,?,(" +
+                            "SELECT uuid FROM player WHERE name LIKE ?" +
+                            "))");
+                }
+                psql.setInt(1, location.getBlockX());
+                psql.setInt(2, location.getBlockY());
+                psql.setInt(3, location.getBlockZ());
+                psql.setString(4, location.getWorld().getName());
+                psql.setString(5, arg);
+                psql.executeUpdate();
             } else {
-                // Insert a player into the ACL by UUID, using subquery
-                psql = db_conn.prepareStatement("REPLACE INTO accesslist (x, y, z, world, member) VALUES (?,?,?,?,(" +
-                        "SELECT uuid FROM player WHERE name LIKE ?" +
-                        "))");
+                results.close();
+                psql.close();
+                return "This block is unowned";
             }
-            psql.setInt(1, location.getBlockX());
-            psql.setInt(2, location.getBlockY());
-            psql.setInt(3, location.getBlockZ());
-            psql.setString(4, location.getWorld().getName());
-            psql.setString(5, arg);
-            psql.executeUpdate();
             psql.close();
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to add item to ACL");
