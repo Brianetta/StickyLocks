@@ -41,4 +41,3 @@ Towny, Factions or WorldGuard regions.
 ## To-do: ##
 
 - Integrate with Logblock (and, perhaps, other logging tools) to limit ownership claim to player who placed block
-- Add option to protect blocks with an inventory from being broken
