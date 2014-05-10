@@ -43,6 +43,7 @@ public class StickyLocksClick implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.isCancelled()) return;
         Block target = event.getClickedBlock();
         Player player = event.getPlayer();
         //if target.getType() ...check it's a protectable block type

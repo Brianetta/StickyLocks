@@ -38,6 +38,7 @@ public class StickyLocksHopperMinecart implements Listener {
 
     @EventHandler
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
+        if (event.isCancelled()) return;
         if (!(event.getSource().getHolder() instanceof BlockState)) {
             return;
         }

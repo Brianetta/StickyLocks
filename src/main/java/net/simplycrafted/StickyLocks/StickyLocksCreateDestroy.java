@@ -34,6 +34,7 @@ public class StickyLocksCreateDestroy implements Listener {
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {
@@ -60,6 +61,7 @@ public class StickyLocksCreateDestroy implements Listener {
 
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event) {
+        if (event.isCancelled()) return;
         Block target = event.getBlock();
         if (target.getState() instanceof Chest) {
             // Double chests are hard to detect. Nevertheless, this will do it,
