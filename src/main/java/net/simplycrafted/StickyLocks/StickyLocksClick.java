@@ -35,6 +35,12 @@ public class StickyLocksClick implements Listener {
         tool = Material.getMaterial(stickylocks.getConfig().getString("tool"));
     }
 
+    // This event handler responds to player actions on blocks. It's broken down by
+    // type (right click, left click, right click nothing, step on plate) and then
+    // further broken down by whether the player is holding the specified tool.
+    // If the player is holding the tool, it manipulates locks. Otherwise, it
+    // enforces access lists.
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Block target = event.getClickedBlock();

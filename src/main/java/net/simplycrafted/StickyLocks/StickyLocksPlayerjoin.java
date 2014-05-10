@@ -21,6 +21,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class StickyLocksPlayerjoin implements Listener {
     Database db = new Database();
 
+    // This event handler detects when a player joins the server, and
+    // inserts or updates their entry in the database, allowing the
+    // plugin to deal with the player's name when they're offline.
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         db.addPlayer(event.getPlayer());

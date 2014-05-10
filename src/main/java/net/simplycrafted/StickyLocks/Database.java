@@ -36,6 +36,11 @@ public class Database {
     static private Connection db_conn;
     static StickyLocks stickylocks;
 
+
+    // The constructor connects the database. The one database connection is
+    // shared across Database instances, of which there will generally be one
+    // per class across the plugin.
+
     public Database() {
         if (db_conn == null) {
             try {
@@ -48,19 +53,39 @@ public class Database {
         stickylocks=StickyLocks.getInstance();
     }
 
+    // Create our tables, if they're not there. One table (protectables) is rebuilt every time
+    // that the plugin is loaded. It just contains a list of block types that we care about.
+
     public void createTables() {
         Statement sql;
         PreparedStatement psql;
         try {
             sql = db_conn.createStatement();
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 0)");
+
+            // Player table - contains name and UUID for players that have been seen by the
+            // plugin. "notify" is whether they want chat spam.
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1)");
+
             // Re-populate this every time we load. The config file is authoritative.
+            // Simple single-column table of Block Type names.
             sql.executeUpdate("DROP TABLE IF EXISTS protectable");
             sql.executeUpdate("CREATE TABLE protectable (material text primary key)");
+
+            // Protected table - links a block location with a UUID as owner. It also keeps a
+            // record of the Material for joining with protectable.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS protected (x integer, y integer, z integer, world text, material text, owner char(36),PRIMARY KEY (x,y,z,world))");
+
+            // Access group table - each player can have zero or more lists of one or more
+            // players, for easy management of access. This table links list owner to list
+            // member by UUID, with name being the name of the list.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS accessgroup (owner char(36),name text,member char(36),PRIMARY KEY (owner,name,member))");
+
+            // Access list table - links a block location with a UUID or an access group
+            // list name. The member field contains the UUID or group name. It's not fussy
+            // which is which - the plugin dynamically figures out what that field has in it.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS accesslist (member text,x integer,y integer,z integer,world text,PRIMARY KEY (x,y,z,world,member))");
             sql.close();
+
             // Load values for protectable blocks from the config
             for (String protectable : stickylocks.getConfig().getStringList("protectables")) {
                 Material material = Material.getMaterial(protectable);
@@ -79,8 +104,15 @@ public class Database {
         }
     }
 
+    // This member function takes a block, and gives you a location. It's the location
+    // of the block, except when it's a double chest or a door. These types occupy more
+    // than one block, but must be treated as one lockable thing. In these cases, this
+    // function will return a predictable location, regardless of which half of the
+    // object is being looked at.
+
     private Location getUnambiguousLocation(Block target) {
         int locX,locY,locZ;
+
 
         if (target.getState() instanceof Chest) {
             // Double chests have an ambiguous location. Get a unique location by
@@ -97,7 +129,8 @@ public class Database {
                 locY = target.getLocation().getBlockY();
                 locZ = target.getLocation().getBlockZ();
             }
-        } else if (target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR")) {
+        } else if ((target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR"))
+                || (target.getType().name().equals("IRON_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("IRON_DOOR"))) {
             // Doors have an ambiguous location, but we only need to check
             // the block below to disambiguate.
             locX = target.getLocation().getBlockX();
@@ -111,12 +144,24 @@ public class Database {
         return new Location(target.getWorld(),locX,locY,locZ);
     }
 
+    // This method queries the database to get basic information about
+    // whether a block is protectable, whether it is protected, and who
+    // owns it.
+
     public Protection getProtection (Block block) {
         PreparedStatement psql;
         ResultSet result;
         Protection returnValue = new Protection(block.getType(), false, null, null);
         Location location = getUnambiguousLocation(block);
         try {
+            // This query selects protectable first, with everything else being
+            // joined to that one-field table. This ensures that no block can be
+            // found to be protected if that type is no longer listed in that
+            // table.
+            //
+            // There are several other ways this could be done, some much more
+            // elegant than this, but this works. It's a candidate for future
+            // optimisation.
             psql = db_conn.prepareStatement("SELECT uuid,name " +
                     "FROM protectable " +
                     "LEFT JOIN protected " +
@@ -146,6 +191,13 @@ public class Database {
         }
     }
 
+    // This method locks a block. It's non-destructive when it comes to
+    // access lists, but if it's used to change owners then groups won't
+    // be updated, and the new owner will need to edit them manually.
+    //
+    // This function assumes all checking has been done, and just does
+    // the work.
+
     public void lockBlock(Block block, Player player) {
         PreparedStatement psql;
         Location location = getUnambiguousLocation(block);
@@ -163,6 +215,13 @@ public class Database {
             stickylocks.getLogger().info("Failed to insert record to lock block");
         }
     }
+
+    // This method unlocks a block. It's destructive when it comes to
+    // access lists, erasing all players and groups associated with this
+    // block from the database.
+    //
+    // This function assumes all checking has been done, and just does
+    // the work.
 
     public void unlockBlock(Block block) {
         PreparedStatement psql;
@@ -186,6 +245,8 @@ public class Database {
         }
     }
 
+    // Cleanly disposes of the database connection.
+
     public void shutdown() {
         try {
             db_conn.close();
@@ -194,9 +255,15 @@ public class Database {
         }
     }
 
+    // Used in the onPlayerJoin handler, to store the player's UUID against
+    // their name. By updating every time a player joins, the plugin responds
+    // properly to name changes.
+
     public void addPlayer(Player player) {
         PreparedStatement psql;
         try {
+            // The sub-select is used to preserve the notification setting. If
+            // nothing is returned, the default is used.
             psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify) values (?,?,(SELECT notify FROM player WHERE uuid=?))");
             psql.setString(1, player.getUniqueId().toString());
             psql.setString(2, player.getName());
@@ -207,6 +274,9 @@ public class Database {
             stickylocks.getLogger().info("Failed to insert/replace newly joined player");
         }
     }
+
+    // This method inserts a player's UUID into the groups table, against that
+    // group's name and the group's owner's UUID.
 
     public String addPlayerToGroup(UUID owner, String group, String member) {
         PreparedStatement psql;
@@ -223,6 +293,7 @@ public class Database {
                 return String.format("Player %s is not known", member);
             }
             result.close();
+            // Use of "REPLACE" syntax avoids duplicates
             psql = db_conn.prepareStatement("REPLACE INTO accessgroup (owner, name, member) VALUES (?,?,?)");
             psql.setString(1,owner.toString());
             psql.setString(2,group);
@@ -234,6 +305,9 @@ public class Database {
         }
         return null;
     }
+
+    // This method removes a player from a group, using a blind delete. It
+    // doesn't matter if they're actually in the group or not.
 
     public String removePlayerFromGroup(UUID owner, String group, String member) {
         PreparedStatement psql;
@@ -262,19 +336,33 @@ public class Database {
         return null;
     }
 
-    public void renameGroup(UUID owner, String group, String newName) {
+    // Originally rename a group, for a specific user. This function is blind, and doesn't
+    // care if the group doesn't exist. If the target name newName already exists as a
+    // group, the end result is that all the players in the group are merged into the new
+    // one. There's some duplicate handling here, because there is a key constraint.
+
+    public void moveMembersToNewGroup(UUID owner, String group, String newName) {
         PreparedStatement psql;
         try {
-            psql = db_conn.prepareStatement("UPDATE accessgroup SET name=? WHERE owner=? AND name LIKE ?");
+            // Move them all into a new group, using "OR IGNORE" resolution to ignore those that are already
+            // in the target group (a key constraint violation).
+            psql = db_conn.prepareStatement("UPDATE OR IGNORE accessgroup SET name=? WHERE owner=? AND name LIKE ?");
             psql.setString(1,newName);
             psql.setString(2,owner.toString());
             psql.setString(3,group);
             psql.executeUpdate();
+            // This query mops up all those left behind, who only remain because they're already in the target group
+            psql = db_conn.prepareStatement("DELETE FROM accessgroup WHERE owner=? AND name LIKE ?");
+            psql.setString(1,owner.toString());
+            psql.setString(2,group);
+            psql.executeUpdate();
             psql.close();
         } catch (SQLException e) {
-            stickylocks.getLogger().info("Failed to remove group member");
+            stickylocks.getLogger().info("Failed to move group member");
         }
     }
+
+    // Method returns an ArrayList of Strings, being the names of players in a group.
 
     public List<String> getGroup(UUID owner, String name) {
         List<String> groupList = new ArrayList<>();
@@ -296,6 +384,9 @@ public class Database {
         }
         return groupList;
     }
+
+    // Returns the UUID of the owner of the block at a Location. Works like a cut-down
+    // getProtection, but takes a Location instead of a Block argument.
 
     public UUID getUUID(Location blockLocation) {
         Location location = getUnambiguousLocation(blockLocation.getBlock());
@@ -332,6 +423,8 @@ public class Database {
         return returnVal;
     }
 
+    // Returns an ArrayList of Strings, being a list of group names for a player.
+
     public List<String> listGroups(UUID owner) {
         List<String> groupList = new ArrayList<>();
         PreparedStatement psql;
@@ -352,6 +445,9 @@ public class Database {
         return groupList;
     }
 
+    // Function to fetch the name of a player, by UUID. Works on offline players
+    // who have been seen by the plugin.
+
     public String getName(UUID player) {
         PreparedStatement psql;
         ResultSet result;
@@ -371,6 +467,9 @@ public class Database {
         return returnVal;
     }
 
+    // Adds a player or group to an access control list. Returns a string, which is
+    // assumed by the caller to indicate success if non-null.
+
     public String addPlayerOrGroupToACL(Location blockLocation, UUID owner, String arg) {
         Location location = getUnambiguousLocation(blockLocation.getBlock());
         PreparedStatement psql;
@@ -380,6 +479,7 @@ public class Database {
             return null;
         }
         try {
+            // First get the owner of the block, if there is one.
             psql = db_conn.prepareStatement("SELECT count(*) FROM protected WHERE owner LIKE ? AND x=? AND y=? AND z=? AND world LIKE ?");
             psql.setString(1, owner.toString());
             psql.setInt(2, location.getBlockX());
@@ -391,6 +491,9 @@ public class Database {
                 // The block is protected and owned by this player
                 results.close();
                 psql.close();
+                // Return two rows; the first is the count of groups with arg as the name, the second the
+                // count of players with arg as the name. It's unlikely that both will be non-zero, but
+                // isn't fatal - it'll just use the group instead of the player.
                 psql = db_conn.prepareStatement("SELECT count(*) FROM accessgroup WHERE owner LIKE ? AND name LIKE ?" +
                         " UNION ALL " +
                         "SELECT count(*) FROM player WHERE name LIKE ?");
@@ -437,6 +540,9 @@ public class Database {
                 String.format("Added PLAYER %s to access list", arg);
     }
 
+    // Removes a player and/or group from an access control list. Returns a string, which is
+    // assumed by the caller to indicate success if non-null.
+
     public String removePlayerOrGroupFromACL(Location blockLocation, String arg) {
         Location location = getUnambiguousLocation(blockLocation.getBlock());
         PreparedStatement psql;
@@ -461,6 +567,9 @@ public class Database {
         // Caller uses non-null return string to indicate success, and sends it on.
         return String.format("Removed %s from access list", arg);
     }
+
+    // Returns an ArrayList of formatted strings, being the access control list for a
+    // block, beginning with the owner, then listing groups and players.
 
     public List<String> getAccess(Location blockLocation) {
         Location location = getUnambiguousLocation(blockLocation.getBlock());
@@ -520,12 +629,17 @@ public class Database {
         return accessDetails;
     }
 
+    // Simple to use Boolean method, answering the inverted question, can this player
+    // use that target block?
+
     public boolean accessDenied(Player player, Block target) {
         PreparedStatement psql;
         ResultSet results;
         Location location = getUnambiguousLocation(target);
         String playerUUID = player.getUniqueId().toString();
         try {
+            // Complicated query. Join the lot, and look for the UUID in three of the fields.
+            // If the count is non-zero, the player is allowed to use the block.
             psql = db_conn.prepareStatement("SELECT count(*) FROM protectable " +
                     "LEFT JOIN protected ON protectable.material=protected.material " +
                     "LEFT JOIN accesslist ON protected.x=accesslist.x " +

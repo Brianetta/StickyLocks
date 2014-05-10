@@ -28,6 +28,16 @@ public class StickyLocksCommand implements CommandExecutor {
 
     Database db = new Database();
 
+    // Command handler follows the command structure in plugin.yml. It looks for the first
+    // argument as being the sub-command. If the sub-command is "group", the next arg is
+    // the group name and the one after is a group sub-command. Any arguments that follow
+    // commands can be repeated, and are looped over.
+    //
+    // It's important to note that sender and playerID are not the same guy. playerID is
+    // the UUID of the owner of the currently selected block. By selecting somebody else's
+    // block, the commands operate on that player's groups and that player's block. Of
+    // course, changes can only be made with the relevant permissions.
+
     public boolean onCommand (CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equals("stickylocks")) {
             if (sender instanceof Player) {
@@ -161,11 +171,10 @@ public class StickyLocksCommand implements CommandExecutor {
                                                 }
                                             }
                                             return true;
-                                        case "rename":
-                                        case "merge":
-                                            // rename group
-                                            db.renameGroup(playerID, args[1], args[3]);
-                                            stickylocks.sendMessage(sender, String.format("Blindly renaming/merging group %s to %s", args[1], args[3]), true);
+                                        case "move":
+                                            // move members to new group
+                                            db.moveMembersToNewGroup(playerID, args[1], args[3]);
+                                            stickylocks.sendMessage(sender, String.format("Blindly moving group members of %s into %s", args[1], args[3]), true);
                                             return true;
                                         default:
                                             stickylocks.sendMessage(sender, "Unknown sub-command for group", false);

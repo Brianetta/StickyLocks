@@ -12,7 +12,7 @@ commands:
             /<command> remove <player|group> ...
             /<command> group <group>
             /<command> group <group> {add|remove} <player> ...
-            /<command> group <group> {rename|merge} <name>
+            /<command> group <group> move <name>
         permission: stickylocks.lock
         aliases: sl
 permissions:

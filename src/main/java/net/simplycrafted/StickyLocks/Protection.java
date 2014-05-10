@@ -24,6 +24,20 @@ public class Protection {
     private UUID powner;
     private String pownerName;
 
+    // This class is just a handy container for returning information about
+    // the protected state (or otherwise) of a block. A null material indicates
+    // that the block is something we don't care about (dirt, stone, torch,
+    // wood, redstone wire, etc, etc). If material is populated, it's in the
+    // config list "protectables" and can be protected buy this plugin.
+    //
+    // The UUID is the owner of the block, as far as this plugin is concerned.
+    // The string is their name, as found in the database, and the boolean value
+    // is simply whether the block is locked or not.
+    //
+    // There's no information about the block itself; whichever class asked for
+    // this already knows about the block. This class's instances are expected
+    // to be discarded fairly quickly.
+
     public Protection(Material t,boolean p, String o, String n) {
         ptype = t;
         pprot = p;

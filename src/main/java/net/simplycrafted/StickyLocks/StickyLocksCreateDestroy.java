@@ -28,6 +28,10 @@ public class StickyLocksCreateDestroy implements Listener {
     Database db = new Database();
     private StickyLocks stickylocks = StickyLocks.getInstance();
 
+    // this event handler responds to a block place event, and either
+    // informs the player that they can lock a chest with the tool,
+    // or locks it for them, depending on the autolock config setting.
+
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         Player player = event.getPlayer();
@@ -43,6 +47,16 @@ public class StickyLocksCreateDestroy implements Listener {
             }
         }
     }
+
+    // This event handler responds to the destruction of a block. If the
+    // block was protected, its data are removed from the database. If
+    // it was a double chest (which implies that a single chest remains)
+    // there's a 50/50 chance that the remaining single chest is no longer
+    // locked. This handler also warns the player.
+    //
+    // Note that this handler does not cancel the destruction of blocks,
+    // protected or not. Protecting blocks from being broken is a job
+    // for another plugin.
 
     @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event) {

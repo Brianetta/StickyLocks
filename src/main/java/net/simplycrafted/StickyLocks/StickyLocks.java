@@ -5,7 +5,11 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 
@@ -66,8 +70,15 @@ public class StickyLocks extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Tidy up our handlers
         PlayerInteractEvent.getHandlerList().unregister(stickylocks);
+        InventoryMoveItemEvent.getHandlerList().unregister(stickylocks);
+        PlayerJoinEvent.getHandlerList().unregister(stickylocks);
+        BlockPlaceEvent.getHandlerList().unregister(stickylocks);
+        BlockBreakEvent.getHandlerList().unregister(stickylocks);
+        // Clear away the database class
         db.shutdown();
+        // Clear the block selections
         SelectedBlock.clear();
     }
 
