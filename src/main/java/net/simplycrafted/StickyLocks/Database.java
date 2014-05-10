@@ -698,4 +698,23 @@ public class Database {
             stickylocks.getLogger().info("Failed to toggle notification for player");
         }
     }
+
+    // Find out if a material is protectable
+
+    public boolean isProtectable(Material type) {
+        PreparedStatement psql;
+        ResultSet results;
+        Boolean returnVal = false;
+        try {
+            psql = db_conn.prepareStatement("SELECT 1 FROM protectable WHERE material LIKE ?");
+            psql.setString(1,type.name());
+            results = psql.executeQuery();
+            if (results.next()) returnVal = true;
+            results.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to determine if type is protectable");
+        }
+        return returnVal;
+    }
 }

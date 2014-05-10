@@ -44,7 +44,9 @@ public class StickyLocksCreateDestroy implements Listener {
                     db.lockBlock(target, player);
                 }
             } else {
-                stickylocks.sendMessage(player, String.format("Right-click then left-click with %s to lock this object",stickylocks.getConfig().getString("tool")),true);
+                if (db.isProtectable(event.getBlockPlaced().getType())) {
+                    stickylocks.sendMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
+                }
             }
         }
     }
