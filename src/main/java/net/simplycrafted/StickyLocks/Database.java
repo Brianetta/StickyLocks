@@ -356,13 +356,19 @@ public class Database {
             psql.setString(2,group);
             psql.executeUpdate();
             // Add the new access group name to access lists that have this access group
-            psql = db_conn.prepareStatement("REPLACE INTO accesslist (member,x,y,z,world) SELECT ?,p.x,p.y,p.z,p.world FROM accesslist AS a INNER JOIN protected AS p ON a.x=p.x AND a.y=p.y AND a.z=p.z AND a.world=p.world WHERE member LIKE ? AND owner LIKE ?");
+            psql = db_conn.prepareStatement("REPLACE INTO accesslist (member,x,y,z,world) " +
+                    "SELECT ?,p.x,p.y,p.z,p.world FROM accesslist AS a " +
+                    "INNER JOIN protected AS p ON a.x=p.x AND a.y=p.y AND a.z=p.z AND a.world=p.world " +
+                    "WHERE member LIKE ? AND owner LIKE ?");
             psql.setString(1,newName);
             psql.setString(2,group);
             psql.setString(3,owner.toString());
             psql.executeUpdate();
             // Now remove the old access group name
-            psql = db_conn.prepareStatement("DELETE FROM accesslist WHERE EXISTS(SELECT 1 FROM protected AS p WHERE accesslist.x=p.x AND accesslist.y=p.y AND accesslist.z=p.z AND accesslist.world=p.world AND member LIKE ? AND owner LIKE ?)");
+            psql = db_conn.prepareStatement("DELETE FROM accesslist WHERE EXISTS(" +
+                    "SELECT 1 FROM protected AS p " +
+                    "WHERE accesslist.x=p.x AND accesslist.y=p.y AND accesslist.z=p.z AND accesslist.world=p.world " +
+                    "AND member LIKE ? AND owner LIKE ?)");
             psql.setString(1,group);
             psql.setString(2,owner.toString());
             psql.executeUpdate();
