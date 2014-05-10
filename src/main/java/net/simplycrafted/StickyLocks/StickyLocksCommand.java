@@ -171,9 +171,10 @@ public class StickyLocksCommand implements CommandExecutor {
                                                 }
                                             }
                                             return true;
-                                        case "move":
+                                        case "rename":
+                                        case "merge":
                                             // move members to new group
-                                            db.moveMembersToNewGroup(playerID, args[1], args[3]);
+                                            db.renameGroup(playerID, args[1], args[3]);
                                             stickylocks.sendMessage(sender, String.format("Blindly moving group members of %s into %s", args[1], args[3]), true);
                                             return true;
                                         default:

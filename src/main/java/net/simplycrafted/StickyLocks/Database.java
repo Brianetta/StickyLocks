@@ -336,29 +336,39 @@ public class Database {
         return null;
     }
 
-    // Originally rename a group, for a specific user. This function is blind, and doesn't
+    // Rename a group, for a specific user. This function is blind, and doesn't
     // care if the group doesn't exist. If the target name newName already exists as a
     // group, the end result is that all the players in the group are merged into the new
     // one. There's some duplicate handling here, because there is a key constraint.
 
-    public void moveMembersToNewGroup(UUID owner, String group, String newName) {
+    public void renameGroup(UUID owner, String group, String newName) {
         PreparedStatement psql;
         try {
-            // Move them all into a new group, using "OR IGNORE" resolution to ignore those that are already
-            // in the target group (a key constraint violation).
-            psql = db_conn.prepareStatement("UPDATE OR IGNORE accessgroup SET name=? WHERE owner=? AND name LIKE ?");
+            // Rename the access groups
+            psql = db_conn.prepareStatement("UPDATE OR IGNORE accessgroup SET name=? WHERE name LIKE ? AND owner like ?");
             psql.setString(1,newName);
-            psql.setString(2,owner.toString());
-            psql.setString(3,group);
+            psql.setString(2,group);
+            psql.setString(3,owner.toString());
             psql.executeUpdate();
             // This query mops up all those left behind, who only remain because they're already in the target group
             psql = db_conn.prepareStatement("DELETE FROM accessgroup WHERE owner=? AND name LIKE ?");
             psql.setString(1,owner.toString());
             psql.setString(2,group);
             psql.executeUpdate();
+            // Add the new access group name to access lists that have this access group
+            psql = db_conn.prepareStatement("REPLACE INTO accesslist (member,x,y,z,world) SELECT ?,p.x,p.y,p.z,p.world FROM accesslist AS a INNER JOIN protected AS p ON a.x=p.x AND a.y=p.y AND a.z=p.z AND a.world=p.world WHERE member LIKE ? AND owner LIKE ?");
+            psql.setString(1,newName);
+            psql.setString(2,group);
+            psql.setString(3,owner.toString());
+            psql.executeUpdate();
+            // Now remove the old access group name
+            psql = db_conn.prepareStatement("DELETE FROM accesslist WHERE EXISTS(SELECT 1 FROM protected AS p WHERE accesslist.x=p.x AND accesslist.y=p.y AND accesslist.z=p.z AND accesslist.world=p.world AND member LIKE ? AND owner LIKE ?)");
+            psql.setString(1,group);
+            psql.setString(2,owner.toString());
+            psql.executeUpdate();
             psql.close();
         } catch (SQLException e) {
-            stickylocks.getLogger().info("Failed to move group member");
+            stickylocks.getLogger().info("Failed to rename group");
         }
     }
 
