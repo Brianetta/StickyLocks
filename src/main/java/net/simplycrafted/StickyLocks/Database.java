@@ -63,7 +63,7 @@ public class Database {
             sql = db_conn.createStatement();
 
             // Player table - contains name and UUID for players that have been seen by the
-            // plugin. "notify" is whether they want chat spam.
+            // plugin. "notify" is whether they want chat spam. It's currently ignored.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1)");
 
             // Re-populate this every time we load. The config file is authoritative.
@@ -353,7 +353,7 @@ public class Database {
             // This query mops up all those left behind, who only remain because they're already in the target group
             psql = db_conn.prepareStatement("DELETE FROM accessgroup WHERE owner=? AND name LIKE ?");
             psql.setString(1,owner.toString());
-            psql.setString(2,group);
+            psql.setString(2, group);
             psql.executeUpdate();
             // Add the new access group name to access lists that have this access group
             psql = db_conn.prepareStatement("REPLACE INTO accesslist (member,x,y,z,world) " +
@@ -653,6 +653,7 @@ public class Database {
         ResultSet results;
         Location location = getUnambiguousLocation(target);
         String playerUUID = player.getUniqueId().toString();
+        Boolean returnVal = false;
         try {
             // Complicated query. Join the lot, and look for the UUID in three of the fields.
             // If the count is non-zero, the player is allowed to use the block.
@@ -674,11 +675,27 @@ public class Database {
             psql.setString(7, playerUUID);
             results = psql.executeQuery();
             if (results.next()) {
-                return results.getInt(1) == 0;
+                returnVal = results.getInt(1) == 0;
             }
+            results.close();
+            psql.close();
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to check access for block");
         }
-        return false;
+        return returnVal;
+    }
+
+    // Toggle notification bit for player. Doesn't do anything at the moment.
+
+    public void toggleNotify(Player player) {
+        PreparedStatement psql;
+        try {
+            psql = db_conn.prepareStatement("UPDATE player SET notify=1-notify WHERE uuid LIKE ?");
+            psql.setString(1,player.getUniqueId().toString());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to toggle notification for player");
+        }
     }
 }

@@ -189,8 +189,9 @@ public class StickyLocksCommand implements CommandExecutor {
                             // wrong number of arguments for group
                             stickylocks.sendMessage(sender,"Wrong number of arguments",false);
                             return false;
-                        case "info" :
-                            stickylocks.sendMessage(sender,"info: Not implemented yet.", false);
+                        case "notify" :
+                            db.toggleNotify((Player)sender);
+                            stickylocks.sendMessage(sender,"Toggled lock notifications", true);
                             return true;
                         default:
                              return false;
