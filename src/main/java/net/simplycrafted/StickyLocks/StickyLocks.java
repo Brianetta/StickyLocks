@@ -53,6 +53,9 @@ public class StickyLocks extends JavaPlugin {
         // Set up handler that detects blocks being created or destroyed
         getServer().getPluginManager().registerEvents(new StickyLocksCreateDestroy(),stickylocks);
 
+        // Set up handler that prevents robbing using hopper minecarts
+        getServer().getPluginManager().registerEvents(new StickyLocksHopperMinecart(),stickylocks);
+
         // Initialise database, and create tables if necessary
         db=new Database();
         db.createTables();
