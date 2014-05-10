@@ -3,7 +3,6 @@ package net.simplycrafted.StickyLocks;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
-import com.sk89q.worldedit.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -56,14 +55,11 @@ public class OtherPlugins {
             // instead of the old magic numbers.
             if (!PlayerCacheUtil.getCachePermission(player,block.getLocation(),block.getTypeId(),block.getData(), TownyPermission.ActionType.BUILD)) {
                 returnVal = false;
-                stickylocks.getLogger().info("Attempt to lock blocked for Towny.");
             }
         }
         if (worldguard != null) {
-//            if (!worldguard.getRegionManager(player.getWorld()).getApplicableRegions(block.getLocation()).canBuild(worldguard.wrapPlayer(player)))  {
             if (!worldguard.canBuild(player, block)) {
                 returnVal = false;
-                stickylocks.getLogger().info("Attempt to lock blocked for WorldGuard.");
             }
         }
         return returnVal;
