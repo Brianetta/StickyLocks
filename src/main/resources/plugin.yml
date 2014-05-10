@@ -3,6 +3,8 @@ main: net.simplycrafted.StickyLocks.StickyLocks
 author: Brianetta
 website: https://github.com/Brianetta/StickyLocks
 version: 0.1
+softdepend:
+    - Towny
 commands:
     stickylocks:
         description: Lock objects to prevent other players accessing them
@@ -38,3 +40,5 @@ permissions:
     stickylocks.reload:
         description: Can reload the plugin
         default: op
+integeration:
+    towny: false
