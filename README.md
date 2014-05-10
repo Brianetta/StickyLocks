@@ -36,9 +36,9 @@ Towny, Factions or WorldGuard regions.
 - Allow users to add users and groups of users to an allowed list
 - Actually enforce these lists
 - Handle blocks which change Type naturally (such as a redstone repeater)
+- Handle automated inventory changes (such as hopper action)
 
 ## To-do: ##
 
 - Integrate with Logblock (and, perhaps, other logging tools) to limit ownership claim to player who placed block
 - Add option to protect blocks with an inventory from being broken
-- Handle automated inventory changes (such as hopper action)
