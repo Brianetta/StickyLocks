@@ -12,6 +12,10 @@
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -26,6 +30,12 @@
             <scope>system</scope>
             <version>0.86.1.4</version>
             <systemPath>/home/brian/Downloads/Towny.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <scope>provided</scope>
+            <artifactId>worldguard</artifactId>
+            <version>5.9.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

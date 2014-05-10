@@ -3,6 +3,8 @@ package net.simplycrafted.StickyLocks;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
+import com.sk89q.worldedit.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -23,6 +25,7 @@ import org.bukkit.entity.Player;
 
 public class OtherPlugins {
     private static Towny towny;
+    private static WorldGuardPlugin worldguard;
     private static StickyLocks stickylocks = StickyLocks.getInstance();
 
     // This class's job is to talk to other plugins, so that StickyLocks can find out
@@ -33,13 +36,13 @@ public class OtherPlugins {
     // Towny
 
     public OtherPlugins() {
-        stickylocks.getLogger().info("Detecting other plugins:");
-        if (stickylocks.getConfig().getBoolean("integration.towny")) {
+        if (towny == null && stickylocks.getConfig().getBoolean("integration.towny")) {
             towny = (Towny) stickylocks.getServer().getPluginManager().getPlugin("Towny");
-            if (towny != null) {
-                stickylocks.getLogger().info("Towny detected. Will obey Towny.");
-                towny = (Towny) stickylocks.getServer().getPluginManager().getPlugin("Towny");
-            }
+            if (towny != null) stickylocks.getLogger().info("Towny detected. Towns matter.");
+        }
+        if (worldguard == null && stickylocks.getConfig().getBoolean("integration.worldguard")) {
+            worldguard = (WorldGuardPlugin) stickylocks.getServer().getPluginManager().getPlugin("WorldGuard");
+            if (worldguard != null) stickylocks.getLogger().info("Worldguard detected. Regions matter.");
         }
     }
 
@@ -48,12 +51,19 @@ public class OtherPlugins {
 
     public Boolean canBuildHere(Player player, Block block) {
         Boolean returnVal=true;
-        stickylocks.getLogger().info("Attempt to lock.");
         if (towny != null) {
             // As soon as Towny gets up to date, this needs to change to use Material
             // instead of the old magic numbers.
             if (!PlayerCacheUtil.getCachePermission(player,block.getLocation(),block.getTypeId(),block.getData(), TownyPermission.ActionType.BUILD)) {
                 returnVal = false;
+                stickylocks.getLogger().info("Attempt to lock blocked for Towny.");
+            }
+        }
+        if (worldguard != null) {
+//            if (!worldguard.getRegionManager(player.getWorld()).getApplicableRegions(block.getLocation()).canBuild(worldguard.wrapPlayer(player)))  {
+            if (!worldguard.canBuild(player, block)) {
+                returnVal = false;
+                stickylocks.getLogger().info("Attempt to lock blocked for WorldGuard.");
             }
         }
         return returnVal;

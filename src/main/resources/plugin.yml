@@ -5,6 +5,7 @@ website: https://github.com/Brianetta/StickyLocks
 version: 0.1
 softdepend:
     - Towny
+    - WorldGuard
 commands:
     stickylocks:
         description: Lock objects to prevent other players accessing them

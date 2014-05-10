@@ -5,6 +5,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -33,7 +34,7 @@ public class StickyLocksCreateDestroy implements Listener {
     // informs the player that they can lock a chest with the tool,
     // or locks it for them, depending on the autolock config setting.
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         // Quit if we can't build here
         if (event.isCancelled() || !otherPlugins.canBuildHere(event.getPlayer(),event.getBlock())) return;
@@ -63,7 +64,7 @@ public class StickyLocksCreateDestroy implements Listener {
     // protected or not. Protecting blocks from being broken is a job
     // for another plugin.
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockBreakEvent(BlockBreakEvent event) {
         if (event.isCancelled()) return;
         Block target = event.getBlock();
