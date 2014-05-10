@@ -28,10 +28,12 @@ public class StickyLocksClick implements Listener {
     Material tool;
     Database db = new Database();
     static StickyLocks stickylocks;
+    OtherPlugins otherPlugins;
 
     // Get the tool item Material from the config
     public StickyLocksClick() {
         stickylocks = StickyLocks.getInstance();
+        otherPlugins = new OtherPlugins();
         tool = Material.getMaterial(stickylocks.getConfig().getString("tool"));
     }
 
@@ -100,8 +102,12 @@ public class StickyLocksClick implements Listener {
                                 stickylocks.sendMessage(player, "You do not own this object", false);
                             }
                         } else if (protection.getType() != null) {
-                            stickylocks.sendMessage(player, "Locking...", true);
-                            db.lockBlock(target, player);
+                            if (otherPlugins.canBuildHere(player, target)) {
+                                stickylocks.sendMessage(player, "Locking...", true);
+                                db.lockBlock(target, player);
+                            } else {
+                                stickylocks.sendMessage(player, "You don't have permission to lock things here", false);
+                            }
                         }
                     } else {
                         stickylocks.sendMessage(player, "You don't have permission to lock or unlock objects", false);
