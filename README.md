@@ -41,3 +41,7 @@ Towny, Factions or WorldGuard regions.
 ## To-do: ##
 
 - Integrate with Logblock (and, perhaps, other logging tools) to limit ownership claim to player who placed block
+- Integrate with Towny, to stop players locking things they couldn't have built
+- Integrate with Worldguard, to stop players locking things is they aren't region members
+- Integrate with Factions, to stop players locking things in enemy bases
+- etc.
