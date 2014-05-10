@@ -27,6 +27,7 @@ import org.bukkit.inventory.InventoryHolder;
 public class StickyLocksCreateDestroy implements Listener {
     Database db = new Database();
     private StickyLocks stickylocks = StickyLocks.getInstance();
+    private OtherPlugins otherPlugins = new OtherPlugins();
 
     // this event handler responds to a block place event, and either
     // informs the player that they can lock a chest with the tool,
@@ -34,7 +35,8 @@ public class StickyLocksCreateDestroy implements Listener {
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
-        if (event.isCancelled()) return;
+        // Quit if we can't build here
+        if (event.isCancelled() || !otherPlugins.canBuildHere(event.getPlayer(),event.getBlock())) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {
