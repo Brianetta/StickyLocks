@@ -13,6 +13,7 @@ commands:
             /<command> group <group>
             /<command> group <group> {add|remove} <player> ...
             /<command> group <group> {rename|merge} <name>
+            /<command> reload
         permission: stickylocks.lock
         aliases: sl
 permissions:
@@ -22,6 +23,7 @@ permissions:
             stickylocks.lock: true
             stickylocks.locksmith: true
             stickylocks.ghost: true
+            stickylocks.reload: true
     stickylocks.lock:
         description: Can lock and unlock blocks
         default: yes
@@ -32,4 +34,7 @@ permissions:
             stickylocks.lock: true
     stickylocks.ghost:
         description: Locks have no effect
+        default: op
+    stickylocks.reload:
+        description: Can reload the plugin
         default: op

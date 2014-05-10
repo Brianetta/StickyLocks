@@ -40,7 +40,7 @@ public class StickyLocks extends JavaPlugin {
     @Override
     public void onEnable() {
         // Make sure the config's on disk and editable
-        saveConfig();
+        saveDefaultConfig();
 
         // We have the instance now. Keep it for convenience.
         stickylocks = this;

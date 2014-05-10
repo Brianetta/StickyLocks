@@ -187,19 +187,34 @@ public class StickyLocksCommand implements CommandExecutor {
                                 }
                             }
                             // wrong number of arguments for group
-                            stickylocks.sendMessage(sender,"Wrong number of arguments",false);
+                            stickylocks.sendMessage(sender, "Wrong number of arguments", false);
                             return false;
                         case "notify" :
                             db.toggleNotify((Player)sender);
                             stickylocks.sendMessage(sender,"Toggled lock notifications", true);
                             return true;
+                        case "reload" :
+                            if(sender.hasPermission("stickylocks.reload")) {
+                                stickylocks.sendMessage(sender, "Reloading configuration", true);
+                                stickylocks.reloadConfig();
+                                db.createTables();
+                            } else {
+                                stickylocks.sendMessage(sender,"No permission",false);
+                            }
+                            return true;
                         default:
-                             return false;
+                            return false;
                     }
                 }
             } else {
                 // Commands that can also be run from console
-                stickylocks.sendMessage(sender,"This doesn't work from console yet.", false);
+                if (args.length > 0  && args[0].equals("reload")) {
+                    stickylocks.sendMessage(sender, "Reloading configuration", true);
+                    stickylocks.reloadConfig();
+                    db.createTables();
+                } else {
+                    stickylocks.sendMessage(sender, "Only the reload command works from console", false);
+                }
                 return true;
             }
         }
