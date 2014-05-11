@@ -1,6 +1,6 @@
 # StickyLocks #
 
-New locking plugin for Bukkit. Database/UUID/tool/command driven (default took is a stick).
+New locking plugin for Bukkit. Database/UUID/tool/command driven (default tool is a stick).
 
 ## Features ##
 
@@ -18,11 +18,10 @@ The list of protectable blocks is configurable, but by default includes
 doors, chests, switches, buttons and pressure plates. It also includes
 redstone repeaters and comparators, protecting redstone device timings.
 
-This plugin does not prevent destruction of any of the protected blocks,
-although there will be an option to protect those with an inventory
-from destruction. The idea is that this plugin will be used in combination
-with some other plugin to provide protection from destruction, such as
-Towny, Factions or WorldGuard regions.
+This plugin does not prevent destruction of any of the protected blocks.
+The idea is that this plugin will be used in combination with some
+other plugin to provide protection from destruction, such as Towny,
+Factions or WorldGuard regions.
 
 ## Done so far: ##
 
@@ -37,11 +36,39 @@ Towny, Factions or WorldGuard regions.
 - Actually enforce these lists
 - Handle blocks which change Type naturally (such as a redstone repeater)
 - Handle automated inventory changes (such as hopper action)
+- Integrate with Towny, to stop players locking things they couldn't have built
+- Integrate with Worldguard, to stop players locking things if they aren't region members
 
 ## To-do: ##
 
 - Integrate with Logblock (and, perhaps, other logging tools) to limit ownership claim to player who placed block
-- Integrate with Towny, to stop players locking things they couldn't have built
-- Integrate with Worldguard, to stop players locking things is they aren't region members
 - Integrate with Factions, to stop players locking things in enemy bases
 - etc.
+
+## Building StickyLocks ##
+
+StickyLocks is a Maven project. It was developed using IntelliJ Idea, but
+should work fine in Eclipse, and shell junkies won't have any trouble. You
+will also need Towny in your libraries, and you'll need to update pom.xml
+with the location of your Towny.jar before Maven can build.
+
+## Installation: ##
+
+After you've built StickyLocks, put the resulting .jar file into your plugins
+folder and start your Bukkit server (or load it with any plugin manager). It
+will write out the default **config.yml** file (as seen
+[here](src/main/resources/config.yml)).
+
+Edit the config if necessary, although everything should work straight away.
+The plugin will create and use StickyLocks.db, which is an
+[SQLite](http://www.sqlite.org/) database that can be queried with any
+SQLite3 compatible client.
+
+Towny and WorldGuard are supported, although more are to come. This integration
+can be disabled, but StickyLocks will automatically detect these plugins
+with the default settings.
+
+## License ##
+
+StickyLocks is [GPL](http://www.gnu.org/copyleft/gpl.html).
+This documentation is [FDL](http://www.gnu.org/copyleft/fdl.html).
