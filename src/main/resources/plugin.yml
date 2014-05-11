@@ -2,7 +2,7 @@ name: StickyLocks
 main: net.simplycrafted.StickyLocks.StickyLocks
 author: Brianetta
 website: https://github.com/Brianetta/StickyLocks
-version: 0.2
+version: 0.3
 softdepend:
     - Towny
     - WorldGuard

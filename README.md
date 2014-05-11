@@ -49,8 +49,9 @@ Factions or WorldGuard regions.
 
 StickyLocks is a Maven project. It was developed using IntelliJ Idea, but
 should work fine in Eclipse, and shell junkies won't have any trouble. You
-will also need Towny in your libraries, and you'll need to update pom.xml
-with the location of your Towny.jar before Maven can build.
+will also need Towny in your libraries, and you'll need to either place
+Towny.jar into the /libs folder of your project, or update pom.xml with the
+location of your Towny.jar before Maven can build.
 
 ## Installation: ##
 
