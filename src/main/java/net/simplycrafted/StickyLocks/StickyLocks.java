@@ -1,5 +1,10 @@
 package net.simplycrafted.StickyLocks;
 
+import net.simplycrafted.StickyLocks.commands.StickyLocksCommand;
+import net.simplycrafted.StickyLocks.listeners.StickyLocksClick;
+import net.simplycrafted.StickyLocks.listeners.StickyLocksCreateDestroy;
+import net.simplycrafted.StickyLocks.listeners.StickyLocksHopperMinecart;
+import net.simplycrafted.StickyLocks.listeners.StickyLocksPlayerjoin;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
