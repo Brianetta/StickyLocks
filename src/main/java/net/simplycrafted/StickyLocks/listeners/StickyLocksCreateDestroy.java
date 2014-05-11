@@ -1,5 +1,9 @@
-package net.simplycrafted.StickyLocks;
+package net.simplycrafted.StickyLocks.listeners;
 
+import net.simplycrafted.StickyLocks.Database;
+import net.simplycrafted.StickyLocks.OtherPlugins;
+import net.simplycrafted.StickyLocks.Protection;
+import net.simplycrafted.StickyLocks.StickyLocks;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;

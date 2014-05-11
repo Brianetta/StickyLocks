@@ -1,13 +1,13 @@
-package net.simplycrafted.StickyLocks;
+package net.simplycrafted.StickyLocks.listeners;
 
-import org.bukkit.block.Block;
+import net.simplycrafted.StickyLocks.Database;
+import net.simplycrafted.StickyLocks.Protection;
+import net.simplycrafted.StickyLocks.StickyLocks;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-
-import javax.swing.text.html.parser.Entity;
 
 /**
  * Copyright © Brian Ronald
