@@ -42,9 +42,8 @@ public class StickyLocksHopperMinecart implements Listener {
         if (!(event.getSource().getHolder() instanceof BlockState)) {
             return;
         }
-        Block block = ((BlockState) event.getSource().getHolder()).getBlock();
         if (event.getDestination().getHolder() instanceof HopperMinecart) {
-            Protection protection = db.getProtection(block);
+            Protection protection = db.getProtection(((BlockState) event.getSource().getHolder()).getBlock());
             if (protection.isProtected()) {
                 event.setCancelled(true);
             }
