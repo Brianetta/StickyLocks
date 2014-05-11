@@ -38,12 +38,12 @@ public class Protection {
     // this already knows about the block. This class's instances are expected
     // to be discarded fairly quickly.
 
-    public Protection(Material t,boolean p, String o, String n) {
-        ptype = t;
-        pprot = p;
-        pownerName = n;
+    public Protection(Material type, boolean protect, String owner, String ownerName) {
+        ptype = type;
+        pprot = protect;
+        pownerName = ownerName;
         try {
-            powner = UUID.fromString(o);
+            powner = UUID.fromString(owner);
         } catch (IllegalArgumentException | NullPointerException e) {
             powner = null;
             pownerName = null;

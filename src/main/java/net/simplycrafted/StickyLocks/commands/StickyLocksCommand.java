@@ -1,5 +1,7 @@
-package net.simplycrafted.StickyLocks;
+package net.simplycrafted.StickyLocks.commands;
 
+import net.simplycrafted.StickyLocks.Database;
+import net.simplycrafted.StickyLocks.StickyLocks;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
