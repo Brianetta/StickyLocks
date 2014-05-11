@@ -202,6 +202,10 @@ public class StickyLocksCommand implements CommandExecutor {
                                 stickylocks.sendMessage(sender,"No permission",false);
                             }
                             return true;
+                        case "clearselection" :
+                            stickylocks.SelectedBlock.remove(sender);
+                            stickylocks.sendMessage(sender, "Selection cleared", true);
+                            return true;
                         default:
                             return false;
                     }
