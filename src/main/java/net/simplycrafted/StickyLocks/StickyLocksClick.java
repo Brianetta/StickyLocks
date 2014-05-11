@@ -62,7 +62,7 @@ public class StickyLocksClick implements Listener {
                         selected = " " + ChatColor.RED + "(selected)";
                     }
                     if (protection.isProtected())
-                        if (protection.getOwner().equals(player.getUniqueId()))
+                        if (player.getUniqueId().equals(protection.getOwner()))
                             stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
                         else
                             stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(), selected), player.hasPermission("stickylocks.locksmith"));

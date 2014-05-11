@@ -151,7 +151,7 @@ public class Database {
     public Protection getProtection (Block block) {
         PreparedStatement psql;
         ResultSet result;
-        Protection returnValue = new Protection(block.getType(), false, null, null);
+        Protection returnValue = new Protection(null, false, null, null);
         Location location = getUnambiguousLocation(block);
         try {
             // This query selects protectable first, with everything else being
@@ -162,7 +162,7 @@ public class Database {
             // There are several other ways this could be done, some much more
             // elegant than this, but this works. It's a candidate for future
             // optimisation.
-            psql = db_conn.prepareStatement("SELECT uuid,name " +
+            psql = db_conn.prepareStatement("SELECT uuid,name,protectable.material " +
                     "FROM protectable " +
                     "LEFT JOIN protected " +
                     "ON protectable.material=protected.material " +
@@ -171,17 +171,24 @@ public class Database {
                     "AND z=?" +
                     "AND world=? " +
                     "LEFT JOIN player " +
-                    "ON owner=uuid");
+                    "ON owner=uuid " +
+                    "WHERE protected.material IS NOT NULL " +
+                    "OR protectable.material LIKE ? " +
+                    "ORDER BY protected.material DESC " +
+                    "LIMIT 1");
             psql.setInt(1, location.getBlockX());
             psql.setInt(2, location.getBlockY());
             psql.setInt(3, location.getBlockZ());
             psql.setString(4, block.getLocation().getWorld().getName());
+            psql.setString(5, block.getType().name());
             result = psql.executeQuery();
-            while (result.next()) {
-                String owner=result.getString(1);
-                if (!result.wasNull()) {
-                    returnValue = new Protection(block.getType(), true, owner, result.getString(2));
-                }
+            if (result.next()) {
+                returnValue = new Protection(
+                        Material.getMaterial(result.getString(3)),  // material
+                        !(result.getString(1)==null),               // protected
+                        result.getString(1),                        // owner uuid (as string)
+                        result.getString(2)                         // owner name
+                );
             }
             result.close();
             psql.close();
