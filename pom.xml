@@ -29,7 +29,7 @@
             <artifactId>Towny</artifactId>
             <scope>system</scope>
             <version>0.86.1.4</version>
-            <systemPath>/home/brian/Downloads/Towny.jar</systemPath>
+            <systemPath>${project.basedir}/libs/Towny.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
