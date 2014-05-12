@@ -1,3 +1,4 @@
+![StickyLocks logo](wiki/StickyLocks.png)
 # StickyLocks #
 
 New locking plugin for Bukkit. Database/UUID/tool/command driven (default tool is a stick).
@@ -23,28 +24,6 @@ The idea is that this plugin will be used in combination with some
 other plugin to provide protection from destruction, such as Towny,
 Factions or WorldGuard regions.
 
-## Done so far: ##
-
-- UUIDs and block locations stored in SQLITE database
-- User-configurable list of protectable blocks
-- User-configurable tool
-- Right-click a protectable block with a tool, tells you who owns it (and cancels event)
-- Right-click a protectable block with a tool, selects it (and cancels event)
-- Allow users to claim and unclaim a protectable block
-- Permissions acted on
-- Allow users to add users and groups of users to an allowed list
-- Actually enforce these lists
-- Handle blocks which change Type naturally (such as a redstone repeater)
-- Handle automated inventory changes (such as hopper action)
-- Integrate with Towny, to stop players locking things they couldn't have built
-- Integrate with Worldguard, to stop players locking things if they aren't region members
-
-## To-do: ##
-
-- Integrate with Logblock (and, perhaps, other logging tools) to limit ownership claim to player who placed block
-- Integrate with Factions, to stop players locking things in enemy bases
-- etc.
-
 ## Building StickyLocks ##
 
 StickyLocks is a Maven project. It was developed using IntelliJ Idea, but
@@ -69,6 +48,44 @@ Towny and WorldGuard are supported, although more are to come. This integration
 can be disabled, but StickyLocks will automatically detect these plugins
 with the default settings.
 
+## Permissions
+
+- **stickylocks.lock** permits a user to claim a block (door, chest, etc) and choose who can use it through an access list
+- **stickylocks.locksmith** permits a user to modify or unlock other users' claimed blocks
+- **stickylocks.ghost** permits a user to open or use blocks that would otherwise be locked by the plugin
+- **stickylocks.reload** permits the player to reload the plugin's config from disk
+
+## Commands
+
+First, the user has to use a tool wand. By default, this is a stick. Right-clicking on a protectable block with the stick will tell the player what that block is, who its owner is, or that it is unowned. The plugin uses green text to indicate that the player has access, or a command succeeded. It uses red to indicate that the player has no access, or that a command failed. Right-clicking on a block with the stick will also select that block.
+
+Once selected, left clicking on the block toggles its lock state. If it's unowned, it will become owned by the player. If it is owned by the player, or the player is a locksmith (see permisisons, above) it will become unowned, and all lock information will be removed. Once selected, commands will operate on that block, or on the user associated with that block.
+
+Right-clicking the air with a stick deselects the selected block.
+
+*/stickylocks* is aliased as */sl*
+
+- **/sl show** lists the lock information for the current block. It shows who owns it, and lists the names of players and groups of players with access to that block. Any groups listed will be as defined by that block's owner.
+- **/sl add &lt;player|group&gt;** adds the specified player or group of players to the list of people allowed to use the block. The group will be one owned by the block's owner, if the player is a locksmith. In the event that a group and a player both have the same name, the group will be used.
+- **/sl remove &lt;player|group&gt;** removes the specified player and/or group of players from the list of people allowed to use that block.
+- **/sl group &lt;group&gt;** lists the members of the specified group. If a block is selected, the group will be that belonging to the block's owner.
+- **/sl group &lt;group&gt; add &lt;player&gt; ...** adds the specified player(s) to the specified group. If a block is selected, the group will be that belonging to the block's owner (and subject to permission).
+- **/sl group &lt;group&gt; remove &lt;player&gt; ...** removes the specified player(s) from the specified group. If a block is selected, the group will be that belonging to the block's owner (and subject to permission).
+- **/sl group &lt;group&gt; {rename|merge} &lt;name&gt;** renames the group (rename and merge are identical sub-commands). If the target group exists, the group's members will be added to it. If a block is selected, the group will be that belonging to the block's owner (and subject to permission).
+- **/sl clearselection** deselects the player's currently selected block, the same as right-clicking air.
+- **/sl reload** reloads the plugin's configuration from the disk, allowing configuration to be changed without restarting the plugin.
+
+## Configuration
+
+Fairly simple, and the defaults are likely to be suitable.
+
+**protectables** is a list of items that can be protected by this plugin. If future versions of Minecraft add new items which should be protected, they can be added by name. Deprecated ID numbers are not supported.
+
+**tools** is the name of the material type the player must hold to select or lock a block.
+
+**chatprefix** is a short text added to the start of chat lines in square brackets. So, the default setting of *SL* would look like *\[SL] Some output here*.
+
+The **integration** section includes keys for plugin integration. Currently there are two, **towny** and **worldguard**. If set to true, the plugin will attempt to detect these plugins, and will use them to help determine whether a player should be allowed to lock a protectable block. If set to false, that plugin will be ignored.
 ## License ##
 
 StickyLocks is [GPL](http://www.gnu.org/copyleft/gpl.html).
