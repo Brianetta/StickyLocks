@@ -1,4 +1,4 @@
-![StickyLocks logo](https://github.com/Brianetta/wiki/StickyLocks.png)
+![StickyLocks logo](https://github.com/Brianetta/StickyLocks/wiki/StickyLocks.png)
 # StickyLocks #
 
 New locking plugin for Bukkit. Database/UUID/tool/command driven (default tool is a stick).
