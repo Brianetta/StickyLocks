@@ -24,6 +24,3 @@ protectables:
 tool: STICK
 chatprefix: SL
 autolock: false
-integration:
-    towny: true
-    worldguard: true

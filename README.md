@@ -27,10 +27,7 @@ Factions or WorldGuard regions.
 ## Building StickyLocks ##
 
 StickyLocks is a Maven project. It was developed using IntelliJ Idea, but
-should work fine in Eclipse, and shell junkies won't have any trouble. You
-will also need Towny in your libraries, and you'll need to either place
-Towny.jar into the /libs folder of your project, or update pom.xml with the
-location of your Towny.jar before Maven can build.
+should work fine in Eclipse, and shell junkies won't have any trouble.
 
 ## Installation: ##
 
@@ -44,9 +41,9 @@ The plugin will create and use StickyLocks.db, which is an
 [SQLite](http://www.sqlite.org/) database that can be queried with any
 SQLite3 compatible client.
 
-Towny and WorldGuard are supported, although more are to come. This integration
-can be disabled, but StickyLocks will automatically detect these plugins
-with the default settings.
+The plugin tried to detect whether other plugins are protecting against
+building. If they are, it won't allow a player to add a lock where they
+cannot build. This is to prevent grief-by-locking.
 
 ## Permissions
 
@@ -85,7 +82,6 @@ Fairly simple, and the defaults are likely to be suitable.
 
 **chatprefix** is a short text added to the start of chat lines in square brackets. So, the default setting of *SL* would look like *\[SL] Some output here*.
 
-The **integration** section includes keys for plugin integration. Currently there are two, **towny** and **worldguard**. If set to true, the plugin will attempt to detect these plugins, and will use them to help determine whether a player should be allowed to lock a protectable block. If set to false, that plugin will be ignored.
 ## License ##
 
 StickyLocks is [GPL](http://www.gnu.org/copyleft/gpl.html).

@@ -23,10 +23,10 @@ import org.bukkit.inventory.ItemStack;
  * GNU General Public License for more details.
  */
 
-public class OtherPlugins implements Listener {
+public class DetectBuildLimiter implements Listener {
     private static StickyLocks stickylocks = StickyLocks.getInstance();
     BlockPlaceEvent blockPlaceEvent;
-    Boolean canPlace = true;
+    Boolean canPlace;
 
     // This class's job is to talk to other plugins, so that StickyLocks can find out
     // whether a player's attempt to lock an object should be prevented on the grounds
@@ -34,9 +34,18 @@ public class OtherPlugins implements Listener {
     //
     // It does so by launching a fake build event, then seeing if anything cancelled it.
 
-    public OtherPlugins() {
+    // This class is an event Listener, and in this constructor registers itself as
+    // a listener for the event it's going to fire.
+
+    public DetectBuildLimiter() {
         stickylocks.getServer().getPluginManager().registerEvents(this,stickylocks);
     }
+
+    // This catches the event, at sufficiently high priority that everything else
+    // should be done with it, but before MONITOR handlers (such as LogBlock or
+    // CoreProtect) might see it. It checks if anything has cancelled the event,
+    // and sets the class member canPlace to false if it has been. Then it cancels
+    // it anyway, to avoid anti-grief plugins logging it.
 
     @EventHandler (priority= EventPriority.HIGHEST)
     public void onBlockPlaceEvent (BlockPlaceEvent event) {
@@ -48,6 +57,10 @@ public class OtherPlugins implements Listener {
         }
     }
 
+    // To be called once whatever instantiated the class is done with it. This
+    // unregisters the event handler now, rather than waiting for GC to get
+    // around to it, cluttering the place up.
+
     public void cleanup () {
         BlockPlaceEvent.getHandlerList().unregister(this);
     }
@@ -56,6 +69,7 @@ public class OtherPlugins implements Listener {
     // be able to build here. Used to decide whether they should be allowed to lock something.
 
     public Boolean canBuildHere(Player player, Block block) {
+        canPlace = true;
         blockPlaceEvent = new BlockPlaceEvent(block, block.getState(),block,new ItemStack(block.getType()),player,true);
         stickylocks.getServer().getPluginManager().callEvent(blockPlaceEvent);
         return canPlace;

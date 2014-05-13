@@ -1,7 +1,7 @@
 package net.simplycrafted.StickyLocks.listeners;
 
 import net.simplycrafted.StickyLocks.Database;
-import net.simplycrafted.StickyLocks.OtherPlugins;
+import net.simplycrafted.StickyLocks.DetectBuildLimiter;
 import net.simplycrafted.StickyLocks.Protection;
 import net.simplycrafted.StickyLocks.StickyLocks;
 import org.bukkit.block.Block;
@@ -32,7 +32,7 @@ import org.bukkit.inventory.InventoryHolder;
 public class StickyLocksCreateDestroy implements Listener {
     Database db = new Database();
     private StickyLocks stickylocks = StickyLocks.getInstance();
-    private OtherPlugins otherPlugins = new OtherPlugins();
+    private DetectBuildLimiter detectBuildLimiter = new DetectBuildLimiter();
 
     // this event handler responds to a block place event, and either
     // informs the player that they can lock a chest with the tool,
@@ -41,7 +41,7 @@ public class StickyLocksCreateDestroy implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         // Quit if we can't build here
-        if (event.isCancelled() || !otherPlugins.canBuildHere(event.getPlayer(),event.getBlock())) return;
+        if (event.isCancelled() || !detectBuildLimiter.canBuildHere(event.getPlayer(),event.getBlock())) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {

@@ -1,7 +1,7 @@
 package net.simplycrafted.StickyLocks.listeners;
 
 import net.simplycrafted.StickyLocks.Database;
-import net.simplycrafted.StickyLocks.OtherPlugins;
+import net.simplycrafted.StickyLocks.DetectBuildLimiter;
 import net.simplycrafted.StickyLocks.Protection;
 import net.simplycrafted.StickyLocks.StickyLocks;
 import org.bukkit.ChatColor;
@@ -32,7 +32,7 @@ public class StickyLocksClick implements Listener {
     Material tool;
     Database db = new Database();
     static StickyLocks stickylocks;
-    OtherPlugins otherPlugins;
+    DetectBuildLimiter detectBuildLimiter;
 
     // Get the tool item Material from the config
     public StickyLocksClick() {
@@ -105,14 +105,14 @@ public class StickyLocksClick implements Listener {
                                 stickylocks.sendMessage(player, "You do not own this object", false);
                             }
                         } else if (protection.getType() != null) {
-                            otherPlugins = new OtherPlugins();
-                            if (otherPlugins.canBuildHere(player, target)) {
+                            detectBuildLimiter = new DetectBuildLimiter();
+                            if (detectBuildLimiter.canBuildHere(player, target)) {
                                 stickylocks.sendMessage(player, "Locking...", true);
                                 db.lockBlock(target, player);
                             } else {
                                 stickylocks.sendMessage(player, "You don't have permission to lock things here", false);
                             }
-                            otherPlugins.cleanup();
+                            detectBuildLimiter.cleanup();
                         }
                     } else {
                         stickylocks.sendMessage(player, "You don't have permission to lock or unlock objects", false);
