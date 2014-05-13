@@ -1,11 +1,12 @@
 package net.simplycrafted.StickyLocks;
 
-import com.palmergames.bukkit.towny.Towny;
-import com.palmergames.bukkit.towny.object.TownyPermission;
-import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Copyright © Brian Ronald
@@ -22,46 +23,41 @@ import org.bukkit.entity.Player;
  * GNU General Public License for more details.
  */
 
-public class OtherPlugins {
-    private static Towny towny;
-    private static WorldGuardPlugin worldguard;
+public class OtherPlugins implements Listener {
     private static StickyLocks stickylocks = StickyLocks.getInstance();
+    BlockPlaceEvent blockPlaceEvent;
+    Boolean canPlace = true;
 
     // This class's job is to talk to other plugins, so that StickyLocks can find out
     // whether a player's attempt to lock an object should be prevented on the grounds
-    // that they couldn't have built the object. Currently, the following plugins
-    // are supported:
+    // that they couldn't have built the object.
     //
-    // Towny
+    // It does so by launching a fake build event, then seeing if anything cancelled it.
 
     public OtherPlugins() {
-        if (towny == null && stickylocks.getConfig().getBoolean("integration.towny")) {
-            towny = (Towny) stickylocks.getServer().getPluginManager().getPlugin("Towny");
-            if (towny != null) stickylocks.getLogger().info("Towny detected. Towns matter.");
+        stickylocks.getServer().getPluginManager().registerEvents(this,stickylocks);
+    }
+
+    @EventHandler (priority= EventPriority.HIGHEST)
+    public void onBlockPlaceEvent (BlockPlaceEvent event) {
+        if (event.equals(blockPlaceEvent)) {
+            if (event.isCancelled()) {
+                canPlace = false;
+            }
+            event.setCancelled(true);
         }
-        if (worldguard == null && stickylocks.getConfig().getBoolean("integration.worldguard")) {
-            worldguard = (WorldGuardPlugin) stickylocks.getServer().getPluginManager().getPlugin("WorldGuard");
-            if (worldguard != null) stickylocks.getLogger().info("Worldguard detected. Regions matter.");
-        }
+    }
+
+    public void cleanup () {
+        BlockPlaceEvent.getHandlerList().unregister(this);
     }
 
     // Function that takes a player and a block, and determines whether the player would
     // be able to build here. Used to decide whether they should be allowed to lock something.
 
     public Boolean canBuildHere(Player player, Block block) {
-        Boolean returnVal=true;
-        if (towny != null) {
-            // As soon as Towny gets up to date, this needs to change to use Material
-            // instead of the old magic numbers.
-            if (!PlayerCacheUtil.getCachePermission(player,block.getLocation(),block.getTypeId(),block.getData(), TownyPermission.ActionType.BUILD)) {
-                returnVal = false;
-            }
-        }
-        if (worldguard != null) {
-            if (!worldguard.canBuild(player, block)) {
-                returnVal = false;
-            }
-        }
-        return returnVal;
+        blockPlaceEvent = new BlockPlaceEvent(block, block.getState(),block,new ItemStack(block.getType()),player,true);
+        stickylocks.getServer().getPluginManager().callEvent(blockPlaceEvent);
+        return canPlace;
     }
 }
