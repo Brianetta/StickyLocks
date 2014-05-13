@@ -19,7 +19,7 @@ The list of protectable blocks is configurable, but by default includes
 doors, chests, switches, buttons and pressure plates. It also includes
 redstone repeaters and comparators, protecting redstone device timings.
 
-This plugin does not prevent destruction of any of the protected blocks.
+**This plugin does not prevent destruction of any of the protected blocks.**
 The idea is that this plugin will be used in combination with some
 other plugin to provide protection from destruction, such as Towny,
 Factions or WorldGuard regions.
