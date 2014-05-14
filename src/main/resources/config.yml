@@ -1,6 +1,7 @@
 protectables:
     - ANVIL
     - BEACON
+    - BURNING_FURNACE
     - CHEST
     - DIODE_BLOCK_ON
     - DIODE_BLOCK_OFF
