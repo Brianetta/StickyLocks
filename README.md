@@ -41,9 +41,9 @@ The plugin will create and use StickyLocks.db, which is an
 [SQLite](http://www.sqlite.org/) database that can be queried with any
 SQLite3 compatible client.
 
-The plugin tried to detect whether other plugins are protecting against
-building. If they are, it won't allow a player to add a lock where they
-cannot build. This is to prevent grief-by-locking.
+The plugin tries to detect whether other plugins are protecting against
+block-breaking. If they are, it won't allow a player to add a lock where they
+cannot break. This is to prevent grief-by-locking.
 
 ## Permissions
 
@@ -82,7 +82,13 @@ Fairly simple, and the defaults are likely to be suitable.
 
 **chatprefix** is a short text added to the start of chat lines in square brackets. So, the default setting of *SL* would look like *\[SL] Some output here*.
 
-## License ##
+## Incompatibilities
+
+If your server is running a no-cheat plugin, you may need to disable checking for instant breaking in order to use StickyLocks. StickyLocks' heuristic for detecting block protection involves faking and then cancelling a block break event, and your no-cheat plugin may well interpret this as cheating behaviour.
+
+In the case of NoCheatPlus, you would need to disable Fastbreak detection.
+
+## License
 
 StickyLocks is [GPL](http://www.gnu.org/copyleft/gpl.html).
 This documentation is [FDL](http://www.gnu.org/copyleft/fdl.html).

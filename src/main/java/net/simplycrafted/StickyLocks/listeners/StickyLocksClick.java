@@ -106,11 +106,9 @@ public class StickyLocksClick implements Listener {
                             }
                         } else if (protection.getType() != null) {
                             detectBuildLimiter = new DetectBuildLimiter();
-                            if (detectBuildLimiter.canBuildHere(player, target)) {
+                            if (detectBuildLimiter.canBreakHere(player, target)) {
                                 stickylocks.sendMessage(player, "Locking...", true);
                                 db.lockBlock(target, player);
-                            } else {
-                                stickylocks.sendMessage(player, "You don't have permission to lock things here", false);
                             }
                             detectBuildLimiter.cleanup();
                         }

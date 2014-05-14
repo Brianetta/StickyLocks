@@ -6,7 +6,7 @@
 
     <groupId>StickyLocks</groupId>
     <artifactId>StickyLocks</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
     <repositories>
         <repository>
             <id>bukkit-repo</id>

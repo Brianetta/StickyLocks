@@ -41,7 +41,7 @@ public class StickyLocksCreateDestroy implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         // Quit if we can't build here
-        if (event.isCancelled() || !detectBuildLimiter.canBuildHere(event.getPlayer(),event.getBlock())) return;
+        if (event.isCancelled() || !detectBuildLimiter.canBreakHere(event.getPlayer(), event.getBlock())) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {

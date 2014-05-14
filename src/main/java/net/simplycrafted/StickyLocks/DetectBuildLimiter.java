@@ -5,8 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.block.BlockBreakEvent;
 
 /**
  * Copyright © Brian Ronald
@@ -25,14 +24,14 @@ import org.bukkit.inventory.ItemStack;
 
 public class DetectBuildLimiter implements Listener {
     private static StickyLocks stickylocks = StickyLocks.getInstance();
-    BlockPlaceEvent blockPlaceEvent;
-    Boolean canPlace;
+    BlockBreakEvent blockBreakEvent;
+    Boolean canBreak;
 
     // This class's job is to talk to other plugins, so that StickyLocks can find out
     // whether a player's attempt to lock an object should be prevented on the grounds
-    // that they couldn't have built the object.
+    // that they couldn't break the object.
     //
-    // It does so by launching a fake build event, then seeing if anything cancelled it.
+    // It does so by launching a fake break event, then seeing if anything cancelled it.
 
     // This class is an event Listener, and in this constructor registers itself as
     // a listener for the event it's going to fire.
@@ -44,14 +43,14 @@ public class DetectBuildLimiter implements Listener {
     // This catches the event, at sufficiently high priority that everything else
     // should be done with it, but before MONITOR handlers (such as LogBlock or
     // CoreProtect) might see it. It checks if anything has cancelled the event,
-    // and sets the class member canPlace to false if it has been. Then it cancels
+    // and sets the class member canBreak to false if it has been. Then it cancels
     // it anyway, to avoid anti-grief plugins logging it.
 
     @EventHandler (priority= EventPriority.HIGHEST)
-    public void onBlockPlaceEvent (BlockPlaceEvent event) {
-        if (event.equals(blockPlaceEvent)) {
+    public void onBlockBreakEvent (BlockBreakEvent event) {
+        if (event.equals(blockBreakEvent)) {
             if (event.isCancelled()) {
-                canPlace = false;
+                canBreak = false;
             }
             event.setCancelled(true);
         }
@@ -62,16 +61,16 @@ public class DetectBuildLimiter implements Listener {
     // around to it, cluttering the place up.
 
     public void cleanup () {
-        BlockPlaceEvent.getHandlerList().unregister(this);
+        BlockBreakEvent.getHandlerList().unregister(this);
     }
 
     // Function that takes a player and a block, and determines whether the player would
-    // be able to build here. Used to decide whether they should be allowed to lock something.
+    // be able to break here. Used to decide whether they should be allowed to lock something.
 
-    public Boolean canBuildHere(Player player, Block block) {
-        canPlace = true;
-        blockPlaceEvent = new BlockPlaceEvent(block, block.getState(),block,new ItemStack(block.getType()),player,true);
-        stickylocks.getServer().getPluginManager().callEvent(blockPlaceEvent);
-        return canPlace;
+    public Boolean canBreakHere(Player player, Block block) {
+        canBreak = true;
+        blockBreakEvent = new BlockBreakEvent(block, player);
+        stickylocks.getServer().getPluginManager().callEvent(blockBreakEvent);
+        return canBreak;
     }
 }
