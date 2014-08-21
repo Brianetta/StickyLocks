@@ -2,6 +2,7 @@ package net.simplycrafted.StickyLocks;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -65,6 +66,11 @@ public class Database {
             // Player table - contains name and UUID for players that have been seen by the
             // plugin. "notify" is whether they want chat spam. It's currently ignored.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1)");
+
+            // Fill that table up with players!
+            for (OfflinePlayer offlinePlayer : stickylocks.getServer().getOfflinePlayers()) {
+                addPlayer(offlinePlayer);
+            }
 
             // Re-populate this every time we load. The config file is authoritative.
             // Simple single-column table of Block Type names.
@@ -185,7 +191,7 @@ public class Database {
             if (result.next()) {
                 returnValue = new Protection(
                         Material.getMaterial(result.getString(3)),  // material
-                        !(result.getString(1)==null),               // protected
+                        !(result.getString(1)==null),                 // protected
                         result.getString(1),                        // owner uuid (as string)
                         result.getString(2)                         // owner name
                 );
@@ -275,6 +281,24 @@ public class Database {
             psql.setString(1, player.getUniqueId().toString());
             psql.setString(2, player.getName());
             psql.setString(3, player.getUniqueId().toString());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to insert/replace newly joined player");
+        }
+    }
+
+    // Used at database initialisation to add all the players that the server has seen already
+
+    public void addPlayer(OfflinePlayer offlinePlayer) {
+        PreparedStatement psql;
+        try {
+            // The sub-select is used to preserve the notification setting. If
+            // nothing is returned, the default is used.
+            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify) values (?,?,(SELECT notify FROM player WHERE uuid=?))");
+            psql.setString(1, offlinePlayer.getUniqueId().toString());
+            psql.setString(2, offlinePlayer.getName());
+            psql.setString(3, offlinePlayer.getUniqueId().toString());
             psql.executeUpdate();
             psql.close();
         } catch (SQLException e) {
