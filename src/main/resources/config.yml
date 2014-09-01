@@ -25,3 +25,4 @@ protectables:
 tool: STICK
 chatprefix: SL
 autolock: false
+populateplayers: true

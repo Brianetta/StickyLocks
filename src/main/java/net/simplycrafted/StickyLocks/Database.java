@@ -67,9 +67,16 @@ public class Database {
             // plugin. "notify" is whether they want chat spam. It's currently ignored.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1)");
 
-            // Fill that table up with players!
-            for (OfflinePlayer offlinePlayer : stickylocks.getServer().getOfflinePlayers()) {
-                addPlayer(offlinePlayer);
+            // Fill that table up with players! (if it's the first time we ever run)
+            if(stickylocks.getConfig().getBoolean("populateplayers")) {
+                stickylocks.getLogger().info("WARNING: BUILDING INITIAL DATABASE FROM ALL OFFLINE PLAYERS");
+                stickylocks.getLogger().info("WARNING: THIS COULD TAKE A LONG TIME AND WILL BE UNRESPONSIVE");
+                for (OfflinePlayer offlinePlayer : stickylocks.getServer().getOfflinePlayers()) {
+                    addPlayer(offlinePlayer);
+                }
+                stickylocks.getLogger().info("Database population complete. This will not happen again unless requested.");
+                stickylocks.getConfig().set("populateplayers", false);
+                stickylocks.saveConfig();
             }
 
             // Re-populate this every time we load. The config file is authoritative.
