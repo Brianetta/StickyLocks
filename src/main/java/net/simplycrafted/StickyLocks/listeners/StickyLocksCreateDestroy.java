@@ -4,7 +4,9 @@ import net.simplycrafted.StickyLocks.Database;
 import net.simplycrafted.StickyLocks.DetectBuildLimiter;
 import net.simplycrafted.StickyLocks.Protection;
 import net.simplycrafted.StickyLocks.StickyLocks;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
@@ -41,7 +43,7 @@ public class StickyLocksCreateDestroy implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         // Quit if we can't build here
-        if (event.isCancelled() || !detectBuildLimiter.canBreakHere(event.getPlayer(), event.getBlock())) return;
+        if (event.isCancelled()) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {
@@ -54,6 +56,27 @@ public class StickyLocksCreateDestroy implements Listener {
                 if (db.isProtectable(event.getBlockPlaced().getType())) {
                     stickylocks.sendMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
                 }
+            }
+        }
+    }
+
+    // this event handler responds to a block place event, checks if
+    // it is a hopper, and blocks it if the block above is protected,
+    // not accessible by the player, and has an inventory.
+
+    @EventHandler (priority = EventPriority.NORMAL)
+    public void onHopperPlaceEvent(BlockPlaceEvent event) {
+        // Quit if we can't build here
+        if (event.isCancelled()) return;
+        Player player = event.getPlayer();
+        Block target = event.getBlock();
+        if (target.getType()== Material.HOPPER) {
+            // Got a hopper - switch target to the block above it
+            target = target.getRelative(BlockFace.UP);
+            if (target.getState() instanceof InventoryHolder & db.getProtection(target).isProtected() & db.accessDenied(player,target)) {
+                // The block above the hopper has an inventory, and it's not ours - cancel!
+                event.setCancelled(true);
+                stickylocks.sendMessage(player,"Hopper placement blocked - access is denied to the inventory above",false);
             }
         }
     }
