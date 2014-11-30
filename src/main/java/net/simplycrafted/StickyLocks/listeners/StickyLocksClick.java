@@ -102,6 +102,9 @@ public class StickyLocksClick implements Listener {
                             if (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("stickylocks.locksmith")) {
                                 stickylocks.sendMessage(player, "Unlocking...", true);
                                 db.unlockBlock(target);
+                                if (Util.getOtherHalfOfChest(target) != null) {
+                                    db.unlockBlock(Util.getOtherHalfOfChest(target));
+                                }
                             } else {
                                 stickylocks.sendMessage(player, "You do not own this object", false);
                             }
