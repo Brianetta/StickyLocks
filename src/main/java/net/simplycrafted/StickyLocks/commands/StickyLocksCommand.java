@@ -2,12 +2,14 @@ package net.simplycrafted.StickyLocks.commands;
 
 import net.simplycrafted.StickyLocks.Database;
 import net.simplycrafted.StickyLocks.StickyLocks;
+import net.simplycrafted.StickyLocks.util.Util;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,6 +89,8 @@ public class StickyLocksCommand implements CommandExecutor {
                                         if (message == null) {
                                             stickylocks.sendMessage(sender, String.format("Failed to add %s to access list (check spelling)", args[i]), false);
                                         } else {
+                                            if (Util.getOtherHalfOfChest(location.getBlock()) != null)
+                                                db.addPlayerOrGroupToACL(Util.getOtherHalfOfChest(location.getBlock()).getLocation(), playerID, args[i]);
                                             stickylocks.sendMessage(sender, message, true);
                                         }
                                     }
@@ -107,6 +111,8 @@ public class StickyLocksCommand implements CommandExecutor {
                                         if (message == null) {
                                             stickylocks.sendMessage(sender, String.format("Failed to remove %s from access list (check spelling)", args[i]), false);
                                         } else {
+                                            if (Util.getOtherHalfOfChest(location.getBlock()) != null)
+                                                db.removePlayerOrGroupFromACL(Util.getOtherHalfOfChest(location.getBlock()).getLocation(), args[i]);
                                             stickylocks.sendMessage(sender, message, true);
                                         }
                                     }

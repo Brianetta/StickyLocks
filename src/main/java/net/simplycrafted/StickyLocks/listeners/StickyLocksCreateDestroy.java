@@ -4,6 +4,7 @@ import net.simplycrafted.StickyLocks.Database;
 import net.simplycrafted.StickyLocks.DetectBuildLimiter;
 import net.simplycrafted.StickyLocks.Protection;
 import net.simplycrafted.StickyLocks.StickyLocks;
+import net.simplycrafted.StickyLocks.util.Util;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -40,20 +41,49 @@ public class StickyLocksCreateDestroy implements Listener {
     // informs the player that they can lock a chest with the tool,
     // or locks it for them, depending on the autolock config setting.
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler (priority = EventPriority.NORMAL)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         // Quit if we can't build here
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
+        //clear any pre-existing locks that might exist due to chunk
+        //regeneration, world edit or rollback operations, and check
+        // for possible chest grief
+        if (Util.getOtherHalfOfChest(target) != null) {
+            // Player just placed the second half of a chest. Is it theirs?
+            Protection protection = db.getProtection(Util.getOtherHalfOfChest(target));
+            if (protection.isProtected()) {
+                if ((protection.getOwner() == player.getUniqueId())||player.hasPermission("stickylocks.locksmith")) {
+                    // It belongs to the player, and needs to have the lock information
+                    // copied to the newly placed half chest
+                    db.duplicate(target, Util.getOtherHalfOfChest(target));
+                    stickylocks.sendMessage(player, "Chest lock has been expanded", true);
+                } else {
+                    // It is belongs to another player, so cancel this event. Denied!
+                    stickylocks.sendMessage(player, "Chest placement blocked - access is denied to the existing chest", false);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        } else {
+            // This is a single chest, or is not a chest
+            db.unlockBlock(target);
+        }
+    }
+
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void checkBlockPlaceEvent(BlockPlaceEvent event) {
+        if (event.isCancelled()) return;
+        Player player = event.getPlayer();
+        Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {
             if (stickylocks.getConfig().getBoolean("autolock")) {
-                Protection protection = db.getProtection(target);
-                if (protection.getType() != null) {
+                if (!db.getProtection(target).isProtected()) {
                     db.lockBlock(target, player);
                 }
             } else {
-                if (db.isProtectable(event.getBlockPlaced().getType())) {
+                if (Util.getOtherHalfOfChest(event.getBlockPlaced()) == null && db.isProtectable(event.getBlockPlaced().getType())) {
                     stickylocks.sendMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
                 }
             }

@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import net.simplycrafted.StickyLocks.util.Util;
 
 /**
  * Copyright © Brian Ronald
@@ -109,6 +110,9 @@ public class StickyLocksClick implements Listener {
                             if (detectBuildLimiter.canBreakHere(player, target)) {
                                 stickylocks.sendMessage(player, "Locking...", true);
                                 db.lockBlock(target, player);
+                                if (Util.getOtherHalfOfChest(target) != null) {
+                                    db.lockBlock(Util.getOtherHalfOfChest(target),player);
+                                }
                             }
                             detectBuildLimiter.cleanup();
                         }
