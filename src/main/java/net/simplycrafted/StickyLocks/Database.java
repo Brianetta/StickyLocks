@@ -743,4 +743,39 @@ public class Database {
         }
         return returnVal;
     }
+
+    public void duplicate(Block target, Block source) {
+        PreparedStatement psql;
+        Location targetLoc = target.getLocation(), sourceLoc=source.getLocation();
+        try {
+            psql = db_conn.prepareStatement("INSERT INTO protected SELECT ? AS x,? AS y,? AS z, ? as world, material, owner FROM protected WHERE x=? AND y=? AND z=? AND world=?");
+            psql.setInt(1,targetLoc.getBlockX());
+            psql.setInt(2,targetLoc.getBlockY());
+            psql.setInt(3,targetLoc.getBlockZ());
+            psql.setString(4,targetLoc.getWorld().getName());
+            psql.setInt(5,sourceLoc.getBlockX());
+            psql.setInt(6,sourceLoc.getBlockY());
+            psql.setInt(7,sourceLoc.getBlockZ());
+            psql.setString(8,sourceLoc.getWorld().getName());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to duplicate lock ownership information");
+        }
+        try {
+            psql = db_conn.prepareStatement("INSERT INTO accesslist SELECT member, ? AS x,? AS y,? AS z, ? as world FROM accesslist WHERE x=? AND y=? AND z=? AND world=?");
+            psql.setInt(1,targetLoc.getBlockX());
+            psql.setInt(2,targetLoc.getBlockY());
+            psql.setInt(3,targetLoc.getBlockZ());
+            psql.setString(4,targetLoc.getWorld().getName());
+            psql.setInt(5,sourceLoc.getBlockX());
+            psql.setInt(6,sourceLoc.getBlockY());
+            psql.setInt(7,sourceLoc.getBlockZ());
+            psql.setString(8,sourceLoc.getWorld().getName());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to duplicate access list information");
+        }
+    }
 }
