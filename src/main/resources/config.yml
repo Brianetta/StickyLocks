@@ -22,6 +22,12 @@ protectables:
     - WOOD_BUTTON
     - WOOD_PLATE
     - WOODEN_DOOR
+    - SPRUCE_DOOR
+    - BIRCH_DOOR
+    - JUNGLE_DOOR
+    - ACACIA_DOOR
+    - DARK_OAK_DOOR
+    - IRON_TRAPDOOR
 tool: STICK
 chatprefix: SL
 autolock: false
