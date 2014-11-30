@@ -125,25 +125,16 @@ public class Database {
 
     private Location getUnambiguousLocation(Block target) {
         int locX,locY,locZ;
-
-
-        if (target.getState() instanceof Chest) {
-            // Double chests have an ambiguous location. Get a unique location by
-            // asking the chest's Inventory for the location of its DoubleChest.
-            Chest chest = (Chest) target.getState();
-            InventoryHolder ih = chest.getInventory().getHolder();
-            if (ih instanceof DoubleChest) {
-                DoubleChest dc = (DoubleChest) ih;
-                locX = dc.getLocation().getBlockX();
-                locY = dc.getLocation().getBlockY();
-                locZ = dc.getLocation().getBlockZ();
-            } else {
-                locX = target.getLocation().getBlockX();
-                locY = target.getLocation().getBlockY();
-                locZ = target.getLocation().getBlockZ();
-            }
-        } else if ((target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR"))
-                || (target.getType().name().equals("IRON_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("IRON_DOOR"))) {
+        // Doors only. This function's useful only for multiple-block Blocks that can't be
+        // partially destroyed, which excludes chests.
+        if ((target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR"))
+                || (target.getType().name().equals("IRON_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("IRON_DOOR"))
+                || (target.getType().name().equals("SPRUCE_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("SPRUCE_DOOR"))
+                || (target.getType().name().equals("BIRCH_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("BIRCH_DOOR"))
+                || (target.getType().name().equals("JUNGLE_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("JUNGLE_DOOR"))
+                || (target.getType().name().equals("ACACIA_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("ACACIA_DOOR"))
+                || (target.getType().name().equals("DARK_OAK_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("DARK_OAK_DOOR"))
+                ) {
             // Doors have an ambiguous location, but we only need to check
             // the block below to disambiguate.
             locX = target.getLocation().getBlockX();
