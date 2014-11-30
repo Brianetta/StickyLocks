@@ -82,10 +82,7 @@ public class StickyLocksCreateDestroy implements Listener {
     }
 
     // This event handler responds to the destruction of a block. If the
-    // block was protected, its data are removed from the database. If
-    // it was a double chest (which implies that a single chest remains)
-    // there's a 50/50 chance that the remaining single chest is no longer
-    // locked. This handler also warns the player.
+    // block was protected, its data are removed from the database.
     //
     // Note that this handler does not cancel the destruction of blocks,
     // protected or not. Protecting blocks from being broken is a job
@@ -94,19 +91,6 @@ public class StickyLocksCreateDestroy implements Listener {
     @EventHandler (priority = EventPriority.MONITOR)
     public void onBlockBreakEvent(BlockBreakEvent event) {
         if (event.isCancelled()) return;
-        Block target = event.getBlock();
-        if (target.getState() instanceof Chest) {
-            // Double chests are hard to detect. Nevertheless, this will do it,
-            // and we'll warn the player that the other portion might not be locked.
-            Chest chest = (Chest) target.getState();
-            InventoryHolder ih = chest.getInventory().getHolder();
-            if (ih instanceof DoubleChest) {
-                Protection protection = db.getProtection(target);
-                if (protection.isProtected()) {
-                    stickylocks.sendMessage(event.getPlayer(), "Check lock on remaining single chest", false);
-                }
-            }
-        }
         db.unlockBlock(event.getBlock());
     }
 }
