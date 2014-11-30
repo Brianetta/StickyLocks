@@ -6,11 +6,11 @@
 
     <groupId>StickyLocks</groupId>
     <artifactId>StickyLocks</artifactId>
-    <version>0.5</version>
+    <version>0.6</version>
     <repositories>
         <repository>
             <id>bukkit-repo</id>
-            <url>http://repo.bukkit.org/content/groups/public/</url>
+            <url>http://maven.sk89q.com/repo/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -18,10 +18,17 @@
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <scope>provided</scope>
-            <version>1.7.9-R0.3-SNAPSHOT</version>
+            <version>1.8-R0.1-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
     <build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
         <pluginManagement>
             <plugins>
                 <plugin>
