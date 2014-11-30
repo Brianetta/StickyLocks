@@ -1,8 +1,8 @@
-name: StickyLocks
+name: ${project.name}
 main: net.simplycrafted.StickyLocks.StickyLocks
 author: Brianetta
 website: https://github.com/Brianetta/StickyLocks
-version: 0.5
+version: ${project.version}
 commands:
     stickylocks:
         description: Lock objects to prevent other players accessing them
