@@ -6,23 +6,27 @@
 
     <groupId>StickyLocks</groupId>
     <artifactId>StickyLocks</artifactId>
-    <version>0.8</version>
+    <version>0.9</version>
     <repositories>
         <repository>
-            <id>bukkit-repo</id>
-            <url>http://maven.sk89q.com/repo/</url>
-        </repository>
-        <repository>
             <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
     <dependencies>
+        <!--Spigot API-->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Bukkit API-->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-            <version>1.8-R0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

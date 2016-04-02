@@ -55,7 +55,7 @@ public class StickyLocksClick implements Listener {
         //if target.getType() ...check it's a protectable block type
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Right-clicks are either with a stick, or not
-            if (event.getPlayer().getItemInHand().getType() == tool) {
+            if (event.getPlayer().getInventory().getItemInMainHand().getType() == tool) {
                 // Stick used - initiate locking, or present actions for locked item
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
@@ -92,7 +92,7 @@ public class StickyLocksClick implements Listener {
             }
         } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             // Left-clicks are either with a stick, or not
-            if (player.getItemInHand().getType() == tool) {
+            if (player.getInventory().getItemInMainHand().getType() == tool) {
                 // Stick used - check if it's the selected block, and lock/unlock if appropriate
                 if (stickylocks.SelectedBlock.get(player) != null && stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1) {
                     // Just left-clicked the selected block with a stick!
@@ -135,7 +135,7 @@ public class StickyLocksClick implements Listener {
                     }
                 }
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (player.getItemInHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
+            if (player.getInventory().getItemInMainHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
                 // Player right-clicked nothing - Deselect whatever might be selected.
                 stickylocks.SelectedBlock.remove(player);
                 stickylocks.sendMessage(player, "Selection cleared", true);
