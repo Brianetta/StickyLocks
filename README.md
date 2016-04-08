@@ -1,7 +1,7 @@
 ![StickyLocks logo](https://github.com/Brianetta/StickyLocks/wiki/StickyLocks.png)
 # StickyLocks #
 
-New locking plugin for Bukkit. Database/UUID/tool/command driven (default tool is a stick).
+Locking plugin for Bukkit/Spigot. Database/UUID/tool/command driven (default tool is a stick).
 
 ## Features ##
 
@@ -78,7 +78,7 @@ Fairly simple, and the defaults are likely to be suitable.
 
 **protectables** is a list of items that can be protected by this plugin. If future versions of Minecraft add new items which should be protected, they can be added by name. Deprecated ID numbers are not supported.
 
-**tools** is the name of the material type the player must hold to select or lock a block.
+**tool** is the name of the material type the player must hold to select or lock a block.
 
 **chatprefix** is a short text added to the start of chat lines in square brackets. So, the default setting of *SL* would look like *\[SL] Some output here*.
 
