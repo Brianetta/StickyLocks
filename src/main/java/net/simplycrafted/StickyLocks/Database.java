@@ -690,6 +690,7 @@ public class Database {
                                         "AND protected.z=accesslist.z " +
                                         "AND protected.world=accesslist.world " +
                     "LEFT JOIN accessgroup ON accesslist.member=accessgroup.name " +
+                                        "AND accessgroup.owner=protected.owner "+
                     "WHERE protected.x=? AND protected.y=? AND protected.z=? AND protected.world LIKE ? " +
                     "AND (accesslist.member LIKE ? OR accessgroup.member LIKE ? OR protected.owner LIKE ?)");
             psql.setInt(1, location.getBlockX());
