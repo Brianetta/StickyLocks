@@ -6,7 +6,7 @@
 
     <groupId>StickyLocks</groupId>
     <artifactId>StickyLocks</artifactId>
-    <version>0.9</version>
+    <version>0.10</version>
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -14,18 +14,11 @@
         </repository>
     </repositories>
     <dependencies>
-        <!--Spigot API-->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.9.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
         <!--Bukkit API-->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.9.2-R0.1-SNAPSHOT</version>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -44,8 +37,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.0</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                     </configuration>
                 </plugin>
             </plugins>
