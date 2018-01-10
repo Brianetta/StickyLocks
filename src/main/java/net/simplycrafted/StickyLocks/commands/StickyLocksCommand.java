@@ -52,12 +52,12 @@ public class StickyLocksCommand implements CommandExecutor {
 
                 // If a block is selected, use that block's owner. If that block has no owner, or
                 // if no block is selected, use the player.
-                if (stickylocks.SelectedBlock.get(sender) == null) {
+                if (stickylocks.selectedBlock.get(sender) == null) {
                     playerID = ((Player) sender).getUniqueId();
                 } else {
-                    playerID = db.getUUID(stickylocks.SelectedBlock.get(sender));
+                    playerID = db.getUUID(stickylocks.selectedBlock.get(sender));
                     if (playerID == null) playerID = ((Player) sender).getUniqueId();
-                    location = stickylocks.SelectedBlock.get(sender);
+                    location = stickylocks.selectedBlock.get(sender);
                 }
 
                 // Player-specific commands
@@ -215,7 +215,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             }
                             return true;
                         case "clearselection" :
-                            stickylocks.SelectedBlock.remove(sender);
+                            stickylocks.selectedBlock.remove(sender);
                             stickylocks.sendMessage(sender, "Selection cleared", true);
                             return true;
                         default:

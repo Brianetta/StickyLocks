@@ -60,9 +60,9 @@ public class StickyLocksClick implements Listener {
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
                     String selected = "";
-                    if (stickylocks.SelectedBlock.get(player) == null || (stickylocks.SelectedBlock.get(player).getWorld().equals(target.getLocation().getWorld()) && !(stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1))) {
+                    if (stickylocks.selectedBlock.get(player) == null || (stickylocks.selectedBlock.get(player).getWorld().equals(target.getLocation().getWorld()) && !(stickylocks.selectedBlock.get(player).distanceSquared(target.getLocation()) < 1))) {
                         // Block is not one previously selected
-                        stickylocks.SelectedBlock.put(player, target.getLocation());
+                        stickylocks.selectedBlock.put(player, target.getLocation());
                         selected = " " + ChatColor.RED + "(selected)";
                     }
                     if (protection.isProtected())
@@ -94,7 +94,7 @@ public class StickyLocksClick implements Listener {
             // Left-clicks are either with a stick, or not
             if (player.getInventory().getItemInMainHand().getType() == tool) {
                 // Stick used - check if it's the selected block, and lock/unlock if appropriate
-                if (stickylocks.SelectedBlock.get(player) != null && (stickylocks.SelectedBlock.get(player).getWorld().equals(target.getLocation().getWorld()) && stickylocks.SelectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
+                if (stickylocks.selectedBlock.get(player) != null && (stickylocks.selectedBlock.get(player).getWorld().equals(target.getLocation().getWorld()) && stickylocks.selectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
                     // Just left-clicked the selected block with a stick!
                     if (player.hasPermission("stickylocks.lock")) {
                         Protection protection = db.getProtection(target);
@@ -135,9 +135,9 @@ public class StickyLocksClick implements Listener {
                     }
                 }
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (player.getInventory().getItemInMainHand().getType() == tool && stickylocks.SelectedBlock.get(player) != null) {
+            if (player.getInventory().getItemInMainHand().getType() == tool && stickylocks.selectedBlock.get(player) != null) {
                 // Player right-clicked nothing - Deselect whatever might be selected.
-                stickylocks.SelectedBlock.remove(player);
+                stickylocks.selectedBlock.remove(player);
                 stickylocks.sendMessage(player, "Selection cleared", true);
             }
         }

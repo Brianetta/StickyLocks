@@ -39,7 +39,7 @@ public class StickyLocks extends JavaPlugin {
 
     private static Database db;
 
-    public HashMap<Player,Location> SelectedBlock;
+    public HashMap<Player,Location> selectedBlock;
     protected HashMap<Player,Boolean> playerNotification;
 
     @Override
@@ -70,7 +70,7 @@ public class StickyLocks extends JavaPlugin {
         db.createTables();
 
         // Which block players might have selected
-        SelectedBlock = new HashMap<Player,Location>();
+        selectedBlock = new HashMap<>();
 
         // Per-player notification settings
         playerNotification = new HashMap<>();
@@ -87,7 +87,7 @@ public class StickyLocks extends JavaPlugin {
         // Clear away the database class
         db.shutdown();
         // Clear the block selections
-        SelectedBlock.clear();
+        selectedBlock.clear();
     }
 
     public static StickyLocks getInstance() {
