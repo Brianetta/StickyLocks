@@ -15,6 +15,7 @@ commands:
             /<command> group <group> {add|remove} <player> ...
             /<command> group <group> {rename|merge} <name>
             /<command> reload
+            /<command> notify
         permission: stickylocks.lock
         aliases: sl
 permissions:
