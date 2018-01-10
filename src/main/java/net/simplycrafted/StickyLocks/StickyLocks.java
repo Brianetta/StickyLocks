@@ -40,7 +40,7 @@ public class StickyLocks extends JavaPlugin {
     private static Database db;
 
     public HashMap<Player,Location> selectedBlock;
-    protected HashMap<Player,Boolean> playerNotification;
+    public HashMap<Player,Boolean> playerNotification;
 
     @Override
     public void onEnable() {
