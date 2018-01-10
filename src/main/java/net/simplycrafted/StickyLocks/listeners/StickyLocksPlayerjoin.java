@@ -1,11 +1,10 @@
 package net.simplycrafted.StickyLocks.listeners;
 
 import net.simplycrafted.StickyLocks.Database;
+import net.simplycrafted.StickyLocks.StickyLocks;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import static net.simplycrafted.StickyLocks.listeners.StickyLocksClick.stickylocks;
 
 /**
  * Copyright © Brian Ronald
@@ -31,6 +30,6 @@ public class StickyLocksPlayerjoin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         db.addPlayer(event.getPlayer());
-        stickylocks.playerNotification.put(event.getPlayer(),db.getNotification(event.getPlayer()));
+        StickyLocks.getInstance().playerNotification.put(event.getPlayer(),db.getNotification(event.getPlayer()));
     }
 }
