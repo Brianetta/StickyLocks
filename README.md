@@ -71,6 +71,7 @@ Right-clicking the air with a stick deselects the selected block.
 - **/sl group &lt;group&gt; {rename|merge} &lt;name&gt;** renames the group (rename and merge are identical sub-commands). If the target group exists, the group's members will be added to it. If a block is selected, the group will be that belonging to the block's owner (and subject to permission).
 - **/sl clearselection** deselects the player's currently selected block, the same as right-clicking air.
 - **/sl reload** reloads the plugin's configuration from the disk, allowing configuration to be changed without restarting the plugin.
+- **/sl notify** toggles the chat-spam received when placing lockable items or using locked items. The player is notified of failures to use locked items via the action bar.
 
 ## Configuration
 
