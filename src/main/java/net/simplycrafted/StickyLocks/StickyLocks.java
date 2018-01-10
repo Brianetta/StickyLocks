@@ -1,5 +1,7 @@
 package net.simplycrafted.StickyLocks;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.simplycrafted.StickyLocks.commands.StickyLocksCommand;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksClick;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksCreateDestroy;
@@ -15,6 +17,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.HashMap;
 
 /**
@@ -39,7 +42,8 @@ public class StickyLocks extends JavaPlugin {
 
     private static Database db;
 
-    public HashMap<Player,Location> SelectedBlock;
+    public HashMap<Player,Location> selectedBlock;
+    public HashMap<Player,Boolean> playerNotification;
 
     @Override
     public void onEnable() {
@@ -68,8 +72,11 @@ public class StickyLocks extends JavaPlugin {
         db=new Database();
         db.createTables();
 
-        // Which block players mighht have selected
-        SelectedBlock = new HashMap<Player,Location>();
+        // Which block players might have selected
+        selectedBlock = new HashMap<>();
+
+        // Per-player notification settings
+        playerNotification = new HashMap<>();
     }
 
     @Override
@@ -83,7 +90,7 @@ public class StickyLocks extends JavaPlugin {
         // Clear away the database class
         db.shutdown();
         // Clear the block selections
-        SelectedBlock.clear();
+        selectedBlock.clear();
     }
 
     public static StickyLocks getInstance() {
@@ -92,7 +99,21 @@ public class StickyLocks extends JavaPlugin {
     }
 
     public void sendMessage(CommandSender player, String message, boolean unlocked) {
+        player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY, getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED, message));
+    }
+
+    public void sendMuteableMessage(CommandSender player, String message, boolean unlocked) {
+        sendMuteableMessage(player, message, unlocked, null);
+    }
+
+    public void sendMuteableMessage(CommandSender player, String message, boolean unlocked, String altMessage) {
         // "unlocked" is a colour flag. If true, message is green. If not, message is red.
-        player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED,message));
+        if(playerNotification.get(player)) {
+            // Chat message
+            player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY, getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED, message));
+        } else if (altMessage != null & player instanceof Player) {
+            // Brief action bar pop-up in red or green
+            ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(altMessage).color(unlocked ? net.md_5.bungee.api.ChatColor.DARK_GREEN : net.md_5.bungee.api.ChatColor.DARK_RED).create());
+        }
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>StickyLocks</groupId>
     <artifactId>StickyLocks</artifactId>
-    <version>0.10</version>
+    <version>0.11</version>
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -14,14 +14,25 @@
         </repository>
     </repositories>
     <dependencies>
+        <!--Spigot API-->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <!--Bukkit API-->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.12.1-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.12-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
 		<resources>

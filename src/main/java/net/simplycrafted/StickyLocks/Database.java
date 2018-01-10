@@ -779,4 +779,21 @@ public class Database {
             stickylocks.getLogger().info("Failed to duplicate access list information");
         }
     }
+
+    public Boolean getNotification(Player player) {
+        PreparedStatement psql;
+        ResultSet results;
+        Boolean returnVal = false;
+        try {
+            psql = db_conn.prepareStatement("SELECT notify FROM player WHERE uuid LIKE ?");
+            psql.setString(1,player.getUniqueId().toString());
+            results = psql.executeQuery();
+            if (results.next()) returnVal = (results.getInt(1) ==1);
+            results.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to fetch notification setting for player");
+        }
+        return returnVal;
+    }
 }

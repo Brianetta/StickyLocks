@@ -2,14 +2,15 @@ package net.simplycrafted.StickyLocks.commands;
 
 import net.simplycrafted.StickyLocks.Database;
 import net.simplycrafted.StickyLocks.StickyLocks;
+import net.simplycrafted.StickyLocks.listeners.StickyLocksClick;
 import net.simplycrafted.StickyLocks.util.Util;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,12 +52,12 @@ public class StickyLocksCommand implements CommandExecutor {
 
                 // If a block is selected, use that block's owner. If that block has no owner, or
                 // if no block is selected, use the player.
-                if (stickylocks.SelectedBlock.get(sender) == null) {
+                if (stickylocks.selectedBlock.get(sender) == null) {
                     playerID = ((Player) sender).getUniqueId();
                 } else {
-                    playerID = db.getUUID(stickylocks.SelectedBlock.get(sender));
+                    playerID = db.getUUID(stickylocks.selectedBlock.get(sender));
                     if (playerID == null) playerID = ((Player) sender).getUniqueId();
-                    location = stickylocks.SelectedBlock.get(sender);
+                    location = stickylocks.selectedBlock.get(sender);
                 }
 
                 // Player-specific commands
@@ -199,6 +200,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             return false;
                         case "notify" :
                             db.toggleNotify((Player)sender);
+                            stickylocks.playerNotification.put((Player) sender, !stickylocks.playerNotification.get((Player) sender));
                             stickylocks.sendMessage(sender,"Toggled lock notifications", true);
                             return true;
                         case "reload" :
@@ -206,12 +208,15 @@ public class StickyLocksCommand implements CommandExecutor {
                                 stickylocks.sendMessage(sender, "Reloading configuration", true);
                                 stickylocks.reloadConfig();
                                 db.createTables();
+                                // Re-register the PlayerInteractEvent in case the tool has changed
+                                PlayerInteractEvent.getHandlerList().unregister(stickylocks);
+                                stickylocks.getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
                             } else {
                                 stickylocks.sendMessage(sender,"No permission",false);
                             }
                             return true;
                         case "clearselection" :
-                            stickylocks.SelectedBlock.remove(sender);
+                            stickylocks.selectedBlock.remove(sender);
                             stickylocks.sendMessage(sender, "Selection cleared", true);
                             return true;
                         default:
@@ -224,6 +229,9 @@ public class StickyLocksCommand implements CommandExecutor {
                     stickylocks.sendMessage(sender, "Reloading configuration", true);
                     stickylocks.reloadConfig();
                     db.createTables();
+                    // Re-register the PlayerInteractEvent in case the tool has changed
+                    PlayerInteractEvent.getHandlerList().unregister(stickylocks);
+                    stickylocks.getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
                 } else {
                     stickylocks.sendMessage(sender, "Only the reload command works from console", false);
                 }
