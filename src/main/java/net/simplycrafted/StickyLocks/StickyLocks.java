@@ -40,6 +40,7 @@ public class StickyLocks extends JavaPlugin {
     private static Database db;
 
     public HashMap<Player,Location> SelectedBlock;
+    protected HashMap<Player,Boolean> playerNotification;
 
     @Override
     public void onEnable() {
@@ -68,8 +69,11 @@ public class StickyLocks extends JavaPlugin {
         db=new Database();
         db.createTables();
 
-        // Which block players mighht have selected
+        // Which block players might have selected
         SelectedBlock = new HashMap<Player,Location>();
+
+        // Per-player notification settings
+        playerNotification = new HashMap<>();
     }
 
     @Override

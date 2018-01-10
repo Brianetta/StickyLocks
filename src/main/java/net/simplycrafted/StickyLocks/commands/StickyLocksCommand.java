@@ -2,14 +2,15 @@ package net.simplycrafted.StickyLocks.commands;
 
 import net.simplycrafted.StickyLocks.Database;
 import net.simplycrafted.StickyLocks.StickyLocks;
+import net.simplycrafted.StickyLocks.listeners.StickyLocksClick;
 import net.simplycrafted.StickyLocks.util.Util;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -206,6 +207,9 @@ public class StickyLocksCommand implements CommandExecutor {
                                 stickylocks.sendMessage(sender, "Reloading configuration", true);
                                 stickylocks.reloadConfig();
                                 db.createTables();
+                                // Re-register the PlayerInteractEvent in case the tool has changed
+                                PlayerInteractEvent.getHandlerList().unregister(stickylocks);
+                                stickylocks.getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
                             } else {
                                 stickylocks.sendMessage(sender,"No permission",false);
                             }
