@@ -67,9 +67,9 @@ public class StickyLocksClick implements Listener {
                     }
                     if (protection.isProtected())
                         if (player.getUniqueId().equals(protection.getOwner()))
-                            stickylocks.sendMuteableMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
+                            stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
                         else
-                            stickylocks.sendMuteableMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(), selected), player.hasPermission("stickylocks.locksmith"));
+                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(), selected), player.hasPermission("stickylocks.locksmith"));
                         // Use of permission on previous line changes colour of message
                     else
                         stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(), selected), true);
