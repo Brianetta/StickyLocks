@@ -113,7 +113,7 @@ public class StickyLocks extends JavaPlugin {
             player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY, getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED, message));
         } else if (altMessage != null & player instanceof Player) {
             // Brief action bar pop-up in red or green
-            ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(altMessage).color(unlocked ? net.md_5.bungee.api.ChatColor.DARK_GREEN : net.md_5.bungee.api.ChatColor.DARK_RED).append(message).create() );
+            ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(altMessage).color(unlocked ? net.md_5.bungee.api.ChatColor.DARK_GREEN : net.md_5.bungee.api.ChatColor.DARK_RED).create());
         }
     }
 }
