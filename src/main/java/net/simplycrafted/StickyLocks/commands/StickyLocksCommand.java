@@ -200,6 +200,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             return false;
                         case "notify" :
                             db.toggleNotify((Player)sender);
+                            stickylocks.playerNotification.put((Player) sender, !stickylocks.playerNotification.get((Player) sender));
                             stickylocks.sendMessage(sender,"Toggled lock notifications", true);
                             return true;
                         case "reload" :
@@ -228,6 +229,9 @@ public class StickyLocksCommand implements CommandExecutor {
                     stickylocks.sendMessage(sender, "Reloading configuration", true);
                     stickylocks.reloadConfig();
                     db.createTables();
+                    // Re-register the PlayerInteractEvent in case the tool has changed
+                    PlayerInteractEvent.getHandlerList().unregister(stickylocks);
+                    stickylocks.getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
                 } else {
                     stickylocks.sendMessage(sender, "Only the reload command works from console", false);
                 }
