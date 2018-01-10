@@ -67,9 +67,9 @@ public class StickyLocksClick implements Listener {
                     }
                     if (protection.isProtected())
                         if (player.getUniqueId().equals(protection.getOwner()))
-                            stickylocks.sendMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
+                            stickylocks.sendMuteableMessage(player, String.format("%s owned by you%s", protection.getType(), selected), true);
                         else
-                            stickylocks.sendMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(), selected), player.hasPermission("stickylocks.locksmith"));
+                            stickylocks.sendMuteableMessage(player, String.format("%s owned by %s%s", protection.getType(), protection.getOwnerName(), selected), player.hasPermission("stickylocks.locksmith"));
                         // Use of permission on previous line changes colour of message
                     else
                         stickylocks.sendMessage(player, String.format("Unowned %s%s", protection.getType(), selected), true);
@@ -80,9 +80,9 @@ public class StickyLocksClick implements Listener {
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected()) {
                     if (protection.getOwner().equals(player.getUniqueId())) {
-                        stickylocks.sendMessage(player, String.format("%s owned by you", protection.getType()), true);
+                        stickylocks.sendMuteableMessage(player, String.format("%s owned by you", protection.getType()), true);
                     } else {
-                        stickylocks.sendMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.ghost"));
+                        stickylocks.sendMuteableMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.ghost"), String.format("LOCKED by %s", protection.getOwnerName()));
                         // Use of permission on previous line changes colour of message
                         if (!player.hasPermission("stickylocks.ghost") && db.accessDenied(player, target)) {
                             event.setCancelled(true);

@@ -99,15 +99,21 @@ public class StickyLocks extends JavaPlugin {
     }
 
     public void sendMessage(CommandSender player, String message, boolean unlocked) {
-        sendMessage(player, message, unlocked, null);
+        player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY, getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED, message));
     }
 
-    public void sendMessage(CommandSender player, String message, boolean unlocked, String altMessage) {
+    public void sendMuteableMessage(CommandSender player, String message, boolean unlocked) {
+        sendMuteableMessage(player, message, unlocked, null);
+    }
+
+    public void sendMuteableMessage(CommandSender player, String message, boolean unlocked, String altMessage) {
         // "unlocked" is a colour flag. If true, message is green. If not, message is red.
         if(playerNotification.get(player)) {
+            // Chat message
             player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY, getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED, message));
         } else if (altMessage != null & player instanceof Player) {
-            ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(altMessage).create());
+            // Brief action bar pop-up in red or green
+            ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(altMessage).color(unlocked ? net.md_5.bungee.api.ChatColor.DARK_GREEN : net.md_5.bungee.api.ChatColor.DARK_RED).append(message).create() );
         }
     }
 }

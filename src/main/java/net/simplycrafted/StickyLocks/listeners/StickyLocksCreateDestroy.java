@@ -8,8 +8,6 @@ import net.simplycrafted.StickyLocks.util.Util;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
-import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -58,10 +56,10 @@ public class StickyLocksCreateDestroy implements Listener {
                     // It belongs to the player, and needs to have the lock information
                     // copied to the newly placed half chest
                     db.duplicate(target, Util.getOtherHalfOfChest(target));
-                    stickylocks.sendMessage(player, "Chest lock has been expanded", true);
+                    stickylocks.sendMuteableMessage(player, "Chest lock has been expanded", true);
                 } else {
                     // It is belongs to another player, so cancel this event. Denied!
-                    stickylocks.sendMessage(player, "Chest placement blocked - access is denied to the existing chest", false);
+                    stickylocks.sendMuteableMessage(player, "Chest placement blocked - access is denied to the existing chest", false, "Can't expand locked chest");
                     event.setCancelled(true);
                     return;
                 }
@@ -84,7 +82,7 @@ public class StickyLocksCreateDestroy implements Listener {
                 }
             } else {
                 if (Util.getOtherHalfOfChest(event.getBlockPlaced()) == null && db.isProtectable(event.getBlockPlaced().getType())) {
-                    stickylocks.sendMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
+                    stickylocks.sendMuteableMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
                 }
             }
         }
@@ -106,7 +104,7 @@ public class StickyLocksCreateDestroy implements Listener {
             if (target.getState() instanceof InventoryHolder & db.getProtection(target).isProtected() & db.accessDenied(player,target)) {
                 // The block above the hopper has an inventory, and it's not ours - cancel!
                 event.setCancelled(true);
-                stickylocks.sendMessage(player,"Hopper placement blocked - access is denied to the inventory above",false);
+                stickylocks.sendMuteableMessage(player,"Hopper placement blocked - access is denied to the inventory above",false, "Hopper placement cancelled, block above locked");
             }
         }
     }
