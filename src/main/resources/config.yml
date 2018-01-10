@@ -28,6 +28,11 @@ protectables:
     - ACACIA_DOOR
     - DARK_OAK_DOOR
     - IRON_TRAPDOOR
+    - ACACIA_FENCE_GATE
+    - BIRCH_FENCE_GATE
+    - DARK_OAK_FENCE_GATE
+    - JUNGLE_FENCE_GATE
+    - SPRUCE_FENCE_GATE
 tool: STICK
 chatprefix: SL
 autolock: false
