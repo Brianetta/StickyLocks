@@ -1,5 +1,7 @@
 package net.simplycrafted.StickyLocks;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.simplycrafted.StickyLocks.commands.StickyLocksCommand;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksClick;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksCreateDestroy;
@@ -15,6 +17,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.HashMap;
 
 /**
@@ -96,7 +99,15 @@ public class StickyLocks extends JavaPlugin {
     }
 
     public void sendMessage(CommandSender player, String message, boolean unlocked) {
+        sendMessage(player, message, unlocked, null);
+    }
+
+    public void sendMessage(CommandSender player, String message, boolean unlocked, String altMessage) {
         // "unlocked" is a colour flag. If true, message is green. If not, message is red.
-        player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY,getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED,message));
+        if(playerNotification.get(player)) {
+            player.sendMessage(String.format("%s[%s]%s %s", ChatColor.GRAY, getConfig().getString("chatprefix"), unlocked ? ChatColor.DARK_GREEN : ChatColor.DARK_RED, message));
+        } else if (altMessage != null & player instanceof Player) {
+            ((Player) player).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(altMessage).create());
+        }
     }
 }
