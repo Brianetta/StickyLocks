@@ -130,7 +130,7 @@ public class StickyLocksClick implements Listener {
             Protection protection = db.getProtection(target);
             if (protection.isProtected())
                 if (!protection.getOwner().equals(player.getUniqueId())) {
-                    if (!player.hasPermission("stickylocks.ghost") || db.accessDenied(player, target)) {
+                    if (!player.hasPermission("stickylocks.ghost") && db.accessDenied(player, target)) {
                         event.setCancelled(true);
                     }
                 }
