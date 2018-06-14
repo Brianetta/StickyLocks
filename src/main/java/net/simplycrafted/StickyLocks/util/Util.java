@@ -2,8 +2,9 @@ package net.simplycrafted.StickyLocks.util;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.inventory.InventoryHolder;
 
 /**
  * Copyright © Brian Ronald
@@ -24,20 +25,22 @@ import org.bukkit.block.Chest;
 // returning null if there isn't one, or the selected block isn't a chest.
 public class Util {
     public static Block getOtherHalfOfChest(Block selectedChest) {
-        // If it isn't a type of chest, there isn't another half of it to find.
+          // If it isn't a type of chest, there isn't another half of it to find.
         if ((selectedChest.getType() != Material.CHEST) && selectedChest.getType() != Material.TRAPPED_CHEST) {
             return null;
         }
 
-        Material selectedChestMaterial = selectedChest.getType();
-        if (selectedChest.getRelative(BlockFace.EAST).getType() == selectedChestMaterial)
-            return selectedChest.getRelative(BlockFace.EAST);
-        if (selectedChest.getRelative(BlockFace.SOUTH).getType() == selectedChestMaterial)
-            return selectedChest.getRelative(BlockFace.SOUTH);
-        if (selectedChest.getRelative(BlockFace.WEST).getType() == selectedChestMaterial)
-            return selectedChest.getRelative(BlockFace.WEST);
-        if (selectedChest.getRelative(BlockFace.NORTH).getType() == selectedChestMaterial)
-            return selectedChest.getRelative(BlockFace.NORTH);
-        return null;
+        InventoryHolder inventoryHolder = ((Chest) selectedChest).getInventory().getHolder();
+        if (!(inventoryHolder instanceof DoubleChest)) {
+            return null;
+        }
+        DoubleChest doubleChest = (DoubleChest) inventoryHolder;
+        Block left = doubleChest.getLeftSide().getInventory().getLocation().getBlock();
+        Block right = doubleChest.getRightSide().getInventory().getLocation().getBlock();
+
+        if (selectedChest.equals(left))
+            return right;
+        else
+            return left;
     }
 }
