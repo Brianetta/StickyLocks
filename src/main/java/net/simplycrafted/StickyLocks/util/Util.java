@@ -30,15 +30,15 @@ public class Util {
             return null;
         }
 
-        InventoryHolder inventoryHolder = ((Chest) selectedChest).getInventory().getHolder();
+        InventoryHolder inventoryHolder = ((Chest) selectedChest.getState()).getInventory().getHolder();
         if (!(inventoryHolder instanceof DoubleChest)) {
             return null;
         }
         DoubleChest doubleChest = (DoubleChest) inventoryHolder;
-        Block left = doubleChest.getLeftSide().getInventory().getLocation().getBlock();
-        Block right = doubleChest.getRightSide().getInventory().getLocation().getBlock();
+        Block left = ((Chest) doubleChest.getLeftSide()).getLocation().getBlock();
+        Block right = ((Chest) doubleChest.getRightSide()).getLocation().getBlock();
 
-        if (selectedChest.equals(left))
+        if (selectedChest.getLocation().equals(left.getLocation()))
             return right;
         else
             return left;
