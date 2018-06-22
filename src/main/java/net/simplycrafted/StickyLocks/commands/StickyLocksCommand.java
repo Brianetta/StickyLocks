@@ -125,6 +125,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             }
                             return true;
                         case "group" :
+                        case "groups" :
                             if (args.length == 1) {
                                 List<String> groupMembers = db.listGroups(playerID);
                                 if (groupMembers.isEmpty()) {
