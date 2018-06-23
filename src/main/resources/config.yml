@@ -35,5 +35,4 @@ protectables:
     - SPRUCE_FENCE_GATE
 tool: STICK
 chatprefix: SL
-autolock: false
 populateplayers: true
