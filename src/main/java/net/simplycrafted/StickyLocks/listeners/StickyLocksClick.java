@@ -55,7 +55,7 @@ public class StickyLocksClick implements Listener {
         //if target.getType() ...check it's a protectable block type
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Right-clicks are either with a stick, or not
-            if (event.getPlayer().getInventory().getItemInMainHand().getType() == tool) {
+            if (event.getItem().getType() == tool) {
                 // Stick used - initiate locking, or present actions for locked item
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
@@ -92,7 +92,7 @@ public class StickyLocksClick implements Listener {
             }
         } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             // Left-clicks are either with a stick, or not
-            if (player.getInventory().getItemInMainHand().getType() == tool) {
+            if (event.getItem().getType() == tool) {
                 // Stick used - check if it's the selected block, and lock/unlock if appropriate
                 if (stickylocks.selectedBlock.get(player) != null && (stickylocks.selectedBlock.get(player).getWorld().equals(target.getLocation().getWorld()) && stickylocks.selectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
                     // Just left-clicked the selected block with a stick!
