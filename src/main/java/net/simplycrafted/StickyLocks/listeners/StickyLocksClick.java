@@ -55,7 +55,7 @@ public class StickyLocksClick implements Listener {
         //if target.getType() ...check it's a protectable block type
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Right-clicks are either with a stick, or not
-            if (event.getItem().getType() == tool) {
+            if (event.getItem() != null && event.getItem().getType() == tool) {
                 // Stick used - initiate locking, or present actions for locked item
                 Protection protection = db.getProtection(target);
                 if (protection.getType() != null) {
