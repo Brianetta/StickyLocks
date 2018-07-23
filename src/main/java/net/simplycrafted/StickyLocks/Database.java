@@ -146,7 +146,19 @@ public class Database {
     public Protection getProtection (Block block) {
         PreparedStatement psql;
         ResultSet result;
-        Protection returnValue = new Protection(null, false, null, null);
+        Protection returnValue;
+        // administrativeLock contains any recently placed chests while they're being checked to see
+        // if they're the second half of a double chest.
+        boolean administrativelyLocked = false;
+        for (Location location : stickylocks.administrativeLock) {
+            if (location.equals(block.getLocation())) {
+                administrativelyLocked = true;
+            }
+        }
+        if (administrativelyLocked) {
+            return new Protection(Material.CHEST, true, null, "SERVER");
+        }
+        returnValue = new Protection(null, false, null, null);
         Location location = getUnambiguousLocation(block);
         try {
             // This query selects protectable first, with everything else being
@@ -189,7 +201,7 @@ public class Database {
             psql.close();
             return returnValue;
         } catch (SQLException e) {
-            return new Protection(null, false, null, null);
+            return returnValue;
         }
     }
 

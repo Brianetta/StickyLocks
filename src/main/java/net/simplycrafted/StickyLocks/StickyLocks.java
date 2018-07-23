@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -44,6 +45,7 @@ public class StickyLocks extends JavaPlugin {
 
     public HashMap<Player,Location> selectedBlock;
     public HashMap<Player,Boolean> playerNotification;
+    public ArrayList<Location> administrativeLock;
 
     @Override
     public void onEnable() {
@@ -77,6 +79,9 @@ public class StickyLocks extends JavaPlugin {
 
         // Per-player notification settings
         playerNotification = new HashMap<>();
+
+        // Administrative locks are a temporary (transient) measure to handle merging of chests.
+        administrativeLock = new ArrayList<>();
     }
 
     @Override
