@@ -46,7 +46,6 @@ public class Protection {
             powner = UUID.fromString(owner);
         } catch (IllegalArgumentException | NullPointerException e) {
             powner = null;
-            pownerName = null;
         }
     }
 
