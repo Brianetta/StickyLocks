@@ -121,28 +121,22 @@ public class Database {
     // object is being looked at.
 
     private Location getUnambiguousLocation(Block target) {
-        int locX,locY,locZ;
         // Doors only. This function's useful only for multiple-block Blocks that can't be
         // partially destroyed, which excludes chests.
-        if ((target.getType().name().equals("WOODEN_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("WOODEN_DOOR"))
-                || (target.getType().name().equals("IRON_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("IRON_DOOR"))
-                || (target.getType().name().equals("SPRUCE_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("SPRUCE_DOOR"))
-                || (target.getType().name().equals("BIRCH_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("BIRCH_DOOR"))
-                || (target.getType().name().equals("JUNGLE_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("JUNGLE_DOOR"))
-                || (target.getType().name().equals("ACACIA_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("ACACIA_DOOR"))
-                || (target.getType().name().equals("DARK_OAK_DOOR") && target.getRelative(BlockFace.DOWN).getType().name().equals("DARK_OAK_DOOR"))
+        Block blockBelow = target.getRelative(BlockFace.DOWN);
+        if (target.getType().equals(Material.getMaterial("OAK_DOOR")) && blockBelow.getType().equals(Material.getMaterial("OAK_DOOR"))
+                || (target.getType().name().equals("IRON_DOOR") && blockBelow.getType().name().equals("IRON_DOOR"))
+                || (target.getType().name().equals("SPRUCE_DOOR") && blockBelow.getType().name().equals("SPRUCE_DOOR"))
+                || (target.getType().name().equals("BIRCH_DOOR") && blockBelow.getType().name().equals("BIRCH_DOOR"))
+                || (target.getType().name().equals("JUNGLE_DOOR") && blockBelow.getType().name().equals("JUNGLE_DOOR"))
+                || (target.getType().name().equals("ACACIA_DOOR") && blockBelow.getType().name().equals("ACACIA_DOOR"))
+                || (target.getType().name().equals("DARK_OAK_DOOR") && blockBelow.getType().name().equals("DARK_OAK_DOOR"))
                 ) {
             // Doors have an ambiguous location, but we only need to check
             // the block below to disambiguate.
-            locX = target.getLocation().getBlockX();
-            locY = target.getLocation().getBlockY() - 1;
-            locZ = target.getLocation().getBlockZ();
-        } else {
-            locX = target.getLocation().getBlockX();
-            locY = target.getLocation().getBlockY();
-            locZ = target.getLocation().getBlockZ();
+            return blockBelow.getLocation();
         }
-        return new Location(target.getWorld(),locX,locY,locZ);
+        return target.getLocation();
     }
 
     // This method queries the database to get basic information about
