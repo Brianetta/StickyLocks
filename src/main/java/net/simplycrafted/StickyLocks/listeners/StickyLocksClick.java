@@ -79,7 +79,7 @@ public class StickyLocksClick implements Listener {
                 // Right-click without a stick
                 Protection protection = db.getProtection(target);
                 if (protection.isProtected()) {
-                    if (protection.getOwner().equals(player.getUniqueId())) {
+                    if (player.getUniqueId().equals(protection.getOwner())) {
                         stickylocks.sendMuteableMessage(player, String.format("%s owned by you", protection.getType()), true);
                     } else {
                         stickylocks.sendMuteableMessage(player, String.format("%s owned by %s", protection.getType(), protection.getOwnerName()), player.hasPermission("stickylocks.ghost"), String.format("LOCKED by %s", protection.getOwnerName()));
@@ -99,7 +99,7 @@ public class StickyLocksClick implements Listener {
                     if (player.hasPermission("stickylocks.lock")) {
                         Protection protection = db.getProtection(target);
                         if (protection.isProtected()) {
-                            if (protection.getOwner().equals(player.getUniqueId()) || player.hasPermission("stickylocks.locksmith")) {
+                            if (player.getUniqueId().equals(protection.getOwner()) || player.hasPermission("stickylocks.locksmith")) {
                                 stickylocks.sendMessage(player, "Unlocking...", true);
                                 db.unlockBlock(target);
                                 if (Util.getOtherHalfOfChest(target) != null) {
@@ -129,7 +129,7 @@ public class StickyLocksClick implements Listener {
             // Pressure plate action
             Protection protection = db.getProtection(target);
             if (protection.isProtected())
-                if (!protection.getOwner().equals(player.getUniqueId())) {
+                if (!player.getUniqueId().equals(protection.getOwner())) {
                     if (!player.hasPermission("stickylocks.ghost") && db.accessDenied(player, target)) {
                         event.setCancelled(true);
                     }
