@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Copyright © Brian Ronald
@@ -46,27 +47,27 @@ public class StickyLocksCreateDestroy implements Listener {
         Player player = event.getPlayer();
         Block target = event.getBlock();
         //clear any pre-existing locks that might exist due to chunk
-        //regeneration, world edit or rollback operations, and check
-        // for possible chest grief
-        if (Util.getOtherHalfOfChest(target) != null) {
-            // Player just placed the second half of a chest. Is it theirs?
-            Protection protection = db.getProtection(Util.getOtherHalfOfChest(target));
-            if (protection.isProtected()) {
-                if ((protection.getOwner() == player.getUniqueId())||player.hasPermission("stickylocks.locksmith")) {
-                    // It belongs to the player, and needs to have the lock information
-                    // copied to the newly placed half chest
-                    db.duplicate(target, Util.getOtherHalfOfChest(target));
-                    stickylocks.sendMuteableMessage(player, "Chest lock has been expanded", true);
-                } else {
-                    // It is belongs to another player, so cancel this event. Denied!
-                    stickylocks.sendMuteableMessage(player, "Chest placement blocked - access is denied to the existing chest", false, "Can't expand locked chest");
-                    event.setCancelled(true);
-                    return;
+        //regeneration, world edit or rollback operations
+        db.unlockBlock(target);
+
+        // Check whether the block is the second half of a chest. This information is
+        // not available to this event (the chests merge later) so administratively
+        // lock it, and schedule it for the next tick (synchronously).
+        if (target.getType() == Material.CHEST || target.getType() == Material.TRAPPED_CHEST) {
+            StickyLocks.getInstance().administrativeLock.add(target.getLocation());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (Util.getOtherHalfOfChest(target) != null) {
+                        Protection firstHalf = db.getProtection(Util.getOtherHalfOfChest(target));
+                        if (firstHalf.isProtected() && firstHalf.getOwner() != null) {
+                            // null owner indicates an administrative lock
+                            db.duplicate(target, Util.getOtherHalfOfChest(target));
+                        }
+                    }
+                    stickylocks.administrativeLock.remove(target.getLocation());
                 }
-            }
-        } else {
-            // This is a single chest, or is not a chest
-            db.unlockBlock(target);
+            }.runTaskLater(stickylocks,1);
         }
     }
 
@@ -81,9 +82,15 @@ public class StickyLocksCreateDestroy implements Listener {
                     db.lockBlock(target, player);
                 }
             } else {
-                if (Util.getOtherHalfOfChest(event.getBlockPlaced()) == null && db.isProtectable(event.getBlockPlaced().getType())) {
-                    stickylocks.sendMuteableMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
-                }
+                // This message is sent if the chest isn't simply being extended, but that information isn't available until after this event.
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (Util.getOtherHalfOfChest(event.getBlockPlaced()) == null && db.isProtectable(event.getBlockPlaced().getType())) {
+                            stickylocks.sendMuteableMessage(player, String.format("Right-click then left-click with %s to lock this object", stickylocks.getConfig().getString("tool")), true);
+                        }
+                    }
+                }.runTaskLater(stickylocks,1);
             }
         }
     }
