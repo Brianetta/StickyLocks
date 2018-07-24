@@ -61,9 +61,24 @@ public class Database {
             sql = db_conn.createStatement();
 
             // Player table - contains name and UUID for players that have been seen by the
-            // plugin. "notify" is whether they want chat spam. "autoamtic" is whether placed
+            // plugin. "notify" is whether they want chat spam. "automatic" is whether placed
             // blocks will automatically be locked.
             sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1,automatic tinyint not null default 0)");
+
+            // Check whether the players table needs the 'automatic' column adding (introduced in 1.0)
+            ResultSet result = sql.executeQuery("PRAGMA table_info(player)");
+            boolean needsUpgrade = true;
+            while (result.next()) {
+                if (result.getString("name").equals("automatic")) {
+                    needsUpgrade = false;
+                    break;
+                }
+            }
+            result.close();
+
+            if (needsUpgrade) {
+                sql.executeUpdate("ALTER TABLE player ADD COLUMN automatic tinyint NOT NULL DEFAULT 1");
+            }
 
             // Fill that table up with players! (if it's the first time we ever run)
             if(stickylocks.getConfig().getBoolean("populateplayers")) {
