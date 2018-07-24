@@ -147,7 +147,7 @@ public class StickyLocksCommand implements CommandExecutor {
                                     stickylocks.sendMessage(sender, String.format("Group \"%s\" (%s) is empty", args[1], db.getName(playerID)), false);
                                 } else {
                                     Boolean colourFlag = playerID.equals(((Player) sender).getUniqueId());
-                                    stickylocks.sendMessage(sender, String.format("Members of group \"%s\" (%s):", args[1], db.getName(playerID)), colourFlag);
+                                    stickylocks.sendMessage(sender, String.format("Group \"%s\" (%s) has %d members:", args[1], db.getName(playerID),groupMembers.size()), colourFlag);
                                     // Show group
                                     for (String groupMember : groupMembers) {
                                         stickylocks.sendMessage(sender, groupMember, colourFlag);
