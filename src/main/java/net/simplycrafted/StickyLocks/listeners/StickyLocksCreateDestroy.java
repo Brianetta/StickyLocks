@@ -38,7 +38,7 @@ public class StickyLocksCreateDestroy implements Listener {
 
     // this event handler responds to a block place event, and either
     // informs the player that they can lock a chest with the tool,
-    // or locks it for them, depending on the autolock config setting.
+    // or locks it for them, depending on their automatic lock bit.
 
     @EventHandler (priority = EventPriority.NORMAL)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
@@ -77,7 +77,7 @@ public class StickyLocksCreateDestroy implements Listener {
         Player player = event.getPlayer();
         Block target = event.getBlock();
         if (player.hasPermission("stickylocks.lock")) {
-            if (stickylocks.getConfig().getBoolean("autolock")) {
+            if (db.getAutomatic(player)) {
                 if (!db.getProtection(target).isProtected()) {
                     db.lockBlock(target, player);
                 }

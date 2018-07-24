@@ -61,8 +61,24 @@ public class Database {
             sql = db_conn.createStatement();
 
             // Player table - contains name and UUID for players that have been seen by the
-            // plugin. "notify" is whether they want chat spam. It's currently ignored.
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1)");
+            // plugin. "notify" is whether they want chat spam. "automatic" is whether placed
+            // blocks will automatically be locked.
+            sql.executeUpdate("CREATE TABLE IF NOT EXISTS player (uuid char(36) primary key,name text,notify tinyint not null default 1,automatic tinyint not null default 0)");
+
+            // Check whether the players table needs the 'automatic' column adding (introduced in 1.0)
+            ResultSet result = sql.executeQuery("PRAGMA table_info(player)");
+            boolean needsUpgrade = true;
+            while (result.next()) {
+                if (result.getString("name").equals("automatic")) {
+                    needsUpgrade = false;
+                    break;
+                }
+            }
+            result.close();
+
+            if (needsUpgrade) {
+                sql.executeUpdate("ALTER TABLE player ADD COLUMN automatic tinyint NOT NULL DEFAULT 1");
+            }
 
             // Fill that table up with players! (if it's the first time we ever run)
             if(stickylocks.getConfig().getBoolean("populateplayers")) {
@@ -278,7 +294,7 @@ public class Database {
         try {
             // The sub-select is used to preserve the notification setting. If
             // nothing is returned, the default is used.
-            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify) values (?,?,(SELECT notify FROM player WHERE uuid=?))");
+            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify,automatic) SELECT ?,?,notify,automatic FROM player WHERE uuid=?))");
             psql.setString(1, player.getUniqueId().toString());
             psql.setString(2, player.getName());
             psql.setString(3, player.getUniqueId().toString());
@@ -296,7 +312,7 @@ public class Database {
         try {
             // The sub-select is used to preserve the notification setting. If
             // nothing is returned, the default is used.
-            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify) values (?,?,(SELECT notify FROM player WHERE uuid=?))");
+            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify,automatic) SELECT ?,?,notify,automatic FROM player WHERE uuid=?))");
             psql.setString(1, offlinePlayer.getUniqueId().toString());
             psql.setString(2, offlinePlayer.getName());
             psql.setString(3, offlinePlayer.getUniqueId().toString());
@@ -732,6 +748,20 @@ public class Database {
         }
     }
 
+    // Toggle automatic lock bit for player. Doesn't do anything at the moment.
+
+    public void toggleAutomatic(Player player) {
+        PreparedStatement psql;
+        try {
+            psql = db_conn.prepareStatement("UPDATE player SET automatic=1-automatic WHERE uuid LIKE ?");
+            psql.setString(1,player.getUniqueId().toString());
+            psql.executeUpdate();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to toggle automatic lock for player");
+        }
+    }
+
     // Find out if a material is protectable
 
     public boolean isProtectable(Material type) {
@@ -799,6 +829,23 @@ public class Database {
             psql.close();
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to fetch notification setting for player");
+        }
+        return returnVal;
+    }
+
+    public Boolean getAutomatic(Player player) {
+        PreparedStatement psql;
+        ResultSet results;
+        Boolean returnVal = false;
+        try {
+            psql = db_conn.prepareStatement("SELECT automatic FROM player WHERE uuid LIKE ?");
+            psql.setString(1,player.getUniqueId().toString());
+            results = psql.executeQuery();
+            if (results.next()) returnVal = (results.getInt(1) ==1);
+            results.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to fetch automatic lock setting for player");
         }
         return returnVal;
     }

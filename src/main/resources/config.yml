@@ -47,5 +47,4 @@ protectables:
     - STONE_PRESSURE_PLATE
 tool: STICK
 chatprefix: SL
-autolock: false
 populateplayers: true
