@@ -77,7 +77,7 @@ public class Database {
             result.close();
 
             if (needsUpgrade) {
-                sql.executeUpdate("ALTER TABLE player ADD COLUMN automatic tinyint NOT NULL DEFAULT 1");
+                sql.executeUpdate("ALTER TABLE player ADD COLUMN automatic tinyint NOT NULL DEFAULT 0");
             }
 
             // Fill that table up with players! (if it's the first time we ever run)
