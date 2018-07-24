@@ -205,7 +205,7 @@ public class StickyLocksCommand implements CommandExecutor {
                             stickylocks.sendMessage(sender,"Toggled lock notifications", true);
                             return true;
                         case "autolock" :
-                            db.toggleNotify((Player)sender);
+                            db.toggleAutomatic((Player)sender);
                             stickylocks.playerNotification.put((Player) sender, !stickylocks.playerNotification.get((Player) sender));
                             stickylocks.sendMessage(sender,"Toggled automatic locking", true);
                             return true;
