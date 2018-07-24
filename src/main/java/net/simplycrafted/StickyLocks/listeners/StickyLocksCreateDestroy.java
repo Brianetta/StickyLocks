@@ -76,13 +76,18 @@ public class StickyLocksCreateDestroy implements Listener {
         if (event.isCancelled()) return;
         Player player = event.getPlayer();
         Block target = event.getBlock();
-        if (player.hasPermission("stickylocks.lock")) {
+        if (db.isProtectable(event.getBlockPlaced().getType()) && player.hasPermission("stickylocks.lock")) {
             if (db.getAutomatic(player)) {
-                if (!db.getProtection(target).isProtected()) {
-                    db.lockBlock(target, player);
-                }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (!db.getProtection(target).isProtected()) {
+                            db.lockBlock(target, player);
+                        }
+                    }
+                }.runTaskLater(stickylocks,1);
             } else {
-                // This message is sent if the chest isn't simply being extended, but that information isn't available until after this event.
+                // This message is sent if a chest isn't simply being extended, but that information isn't available until after this event.
                 new BukkitRunnable() {
                     @Override
                     public void run() {
