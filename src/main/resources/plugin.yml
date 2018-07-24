@@ -18,6 +18,7 @@ commands:
             /<command> group <group> {rename|merge} <name>
             /<command> reload
             /<command> notify
+            /<command> autolock
         permission: stickylocks.lock
         aliases: sl
 permissions:
