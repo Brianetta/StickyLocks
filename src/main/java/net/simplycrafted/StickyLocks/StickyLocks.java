@@ -20,6 +20,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Copyright © Brian Ronald
@@ -47,10 +49,78 @@ public class StickyLocks extends JavaPlugin {
     public HashMap<Player,Boolean> playerNotification;
     public ArrayList<Location> administrativeLock;
 
+    private void updateConfig() {
+        if (getConfig().getString("version",null) == null) {
+            // Pre-version 1.0 to 1.0
+            Set<String> protectables = new HashSet<>(getConfig().getStringList("protectables"));
+            Set<String> updatedProtectables = new HashSet<>();
+            for (String protectable : protectables) {
+                // Replace all the Materials that got renamed with the Minecraft 1.13 update
+                switch (protectable) {
+                    case "BURNING_FURNACE":
+                        break;
+                    case "DIODE_BLOCK_ON":
+                        updatedProtectables.add("REPEATER");
+                        break;
+                    case "DIODE_BLOCK_OFF":
+                        updatedProtectables.add("REPEATER");
+                        break;
+                    case "FENCE_GATE":
+                        updatedProtectables.add("OAK_FENCE_GATE");
+                        break;
+                    case "GOLD_PLATE":
+                        updatedProtectables.add("LIGHT_WEIGHTED_PRESSURE_PLATE");
+                        break;
+                    case "IRON_PLATE":
+                        updatedProtectables.add("HEAVY_WEIGHTED_PRESSURE_PLATE");
+                        break;
+                    case "REDSTONE_COMPARATOR_OFF":
+                        break;
+                    case "STONE_PLATE":
+                        updatedProtectables.add("STONE_PRESSURE_PLATE");
+                        break;
+                    case "TRAP_DOOR":
+                        updatedProtectables.add("OAK_TRAPDOOR");
+                        updatedProtectables.add("BIRCH_TRAPDOOR");
+                        updatedProtectables.add("SPRUCE_TRAPDOOR");
+                        updatedProtectables.add("JUNGLE_TRAPDOOR");
+                        updatedProtectables.add("ACACIA_TRAPDOOR");
+                        updatedProtectables.add("DARK_OAK_TRAPDOOR");
+                        break;
+                    case "WOOD_BUTTON":
+                        updatedProtectables.add("OAK_BUTTON");
+                        updatedProtectables.add("BIRCH_BUTTON");
+                        updatedProtectables.add("SPRUCE_BUTTON");
+                        updatedProtectables.add("JUNGLE_BUTTON");
+                        updatedProtectables.add("ACACIA_BUTTON");
+                        updatedProtectables.add("DARK_OAK_BUTTON");
+                        break;
+                    case "WOODEN_DOOR":
+                        updatedProtectables.add("OAK_DOOR");
+                        break;
+                    case "WOOD_PLATE":
+                        updatedProtectables.add("OAK_PRESSURE_PLATE");
+                        updatedProtectables.add("SPRUCE_PRESSURE_PLATE");
+                        updatedProtectables.add("ACACIA_PRESSURE_PLATE");
+                        updatedProtectables.add("BIRCH_PRESSURE_PLATE");
+                        updatedProtectables.add("DARK_OAK_PRESSURE_PLATE");
+                        updatedProtectables.add("JUNGLE_PRESSURE_PLATE");
+                        break;
+                    default:
+                        updatedProtectables.add(protectable);
+                }
+            }
+            getConfig().set("version", "1.0");
+            getConfig().set("protectables", new ArrayList<>(updatedProtectables));
+            saveConfig();
+        }
+    }
+
     @Override
     public void onEnable() {
         // Make sure the config's on disk and editable
         saveDefaultConfig();
+        updateConfig();
 
         // We have the instance now. Keep it for convenience.
         stickylocks = this;
