@@ -92,7 +92,7 @@ public class StickyLocksClick implements Listener {
             }
         } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             // Left-clicks are either with a stick, or not
-            if (event.getItem().getType() == tool) {
+            if (event.getItem() != null && event.getItem().getType() == tool) {
                 // Stick used - check if it's the selected block, and lock/unlock if appropriate
                 if (stickylocks.selectedBlock.get(player) != null && (stickylocks.selectedBlock.get(player).getWorld().equals(target.getLocation().getWorld()) && stickylocks.selectedBlock.get(player).distanceSquared(target.getLocation()) < 1)) {
                     // Just left-clicked the selected block with a stick!
