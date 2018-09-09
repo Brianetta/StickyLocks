@@ -41,7 +41,7 @@ public class StickyLocksTabCompleter implements TabCompleter {
         if (command.getName().equals("stickylocks")) {
             if (!(sender instanceof Player)) {
                 // Just one command for console right now
-                return Arrays.asList("reload");
+                return args.length <= 1 ? Collections.singletonList("reload") : Collections.emptyList();
             } else {
                 // We have a player, get their selected block and the block's owner
                 Location selectedLocation = null;
