@@ -849,4 +849,89 @@ public class Database {
         }
         return returnVal;
     }
+
+    public List<String> getAccessTab(Location blockLocation) {
+        Location location = getUnambiguousLocation(blockLocation.getBlock());
+        List<String> accessDetails = new ArrayList<>();
+        PreparedStatement psql;
+        ResultSet results;
+        if (location == null) {
+            return null;
+        }
+        try {
+            psql = db_conn.prepareStatement("SELECT name FROM accesslist INNER JOIN player ON member=uuid " +
+                    "WHERE x=? AND y=? AND z=? AND world LIKE ?");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            results = psql.executeQuery();
+            while (results.next()) {
+                accessDetails.add(results.getString(1));
+            }
+            results.close();
+            psql.close();
+            psql = db_conn.prepareStatement("SELECT member FROM accesslist LEFT JOIN player ON member=uuid " +
+                    "WHERE x=? AND y=? AND z=? AND world LIKE ? AND player.uuid IS NULL");
+            psql.setInt(1, location.getBlockX());
+            psql.setInt(2, location.getBlockY());
+            psql.setInt(3, location.getBlockZ());
+            psql.setString(4, location.getWorld().getName());
+            results = psql.executeQuery();
+            while (results.next()) {
+                accessDetails.add(results.getString(1));
+            }
+            results.close();
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to determine information about block");
+        }
+        return accessDetails;
+    }
+
+    public List<String> getGroupsTab(UUID owner) {
+        List<String> groupList = new ArrayList<>();
+        PreparedStatement psql;
+        ResultSet result;
+        try {
+            psql = db_conn.prepareStatement("SELECT name FROM accessgroup WHERE owner=? GROUP BY name ORDER BY name");
+            psql.setString(1, owner.toString());
+            result = psql.executeQuery();
+            while(result.next()) {
+                result.getString(1);
+                if(!result.wasNull())
+                    groupList.add(result.getString(1));
+            }
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to retrieve group list");
+        }
+        return groupList;
+    }
+
+    public List<String> getPlayersTab(UUID owner) {
+        List<String> groupList = new ArrayList<>();
+        PreparedStatement psql;
+        ResultSet result;
+        try {
+            psql = db_conn.prepareStatement("SELECT name FROM player WHERE uuid<>? ORDER BY name");
+            psql.setString(1, owner.toString());
+            result = psql.executeQuery();
+            while(result.next()) {
+                result.getString(1);
+                if(!result.wasNull())
+                    groupList.add(result.getString(1));
+            }
+            psql.close();
+        } catch (SQLException e) {
+            stickylocks.getLogger().info("Failed to retrieve player list");
+        }
+        return groupList;
+    }
+
+    public List<String> getGroupsAndPlayersTab(UUID owner) {
+        List<String> groupsAndPlayers = getGroupsTab(owner);
+        groupsAndPlayers.addAll(getPlayersTab(owner));
+        return groupsAndPlayers;
+    }
 }

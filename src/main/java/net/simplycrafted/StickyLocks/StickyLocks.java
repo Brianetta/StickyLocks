@@ -3,6 +3,7 @@ package net.simplycrafted.StickyLocks;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.simplycrafted.StickyLocks.commands.StickyLocksCommand;
+import net.simplycrafted.StickyLocks.commands.StickyLocksTabCompleter;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksClick;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksCreateDestroy;
 import net.simplycrafted.StickyLocks.listeners.StickyLocksHopperMinecart;
@@ -127,6 +128,7 @@ public class StickyLocks extends JavaPlugin {
 
         // Commands are handled in this class.
         getCommand("stickylocks").setExecutor(new StickyLocksCommand());
+        getCommand("stickylocks").setTabCompleter(new StickyLocksTabCompleter());
 
         // Set up event handler for clicking blocks
         getServer().getPluginManager().registerEvents(new StickyLocksClick(),stickylocks);
