@@ -294,7 +294,7 @@ public class Database {
         try {
             // The sub-select is used to preserve the notification setting. If
             // nothing is returned, the default is used.
-            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify,automatic) SELECT ?,?,notify,automatic FROM player WHERE uuid=?))");
+            psql = db_conn.prepareStatement("INSERT INTO player (uuid,name) SELECT ?,? WHERE NOT EXISTS (SELECT 1 FROM player WHERE uuid=?)");
             psql.setString(1, player.getUniqueId().toString());
             psql.setString(2, player.getName());
             psql.setString(3, player.getUniqueId().toString());
@@ -312,7 +312,7 @@ public class Database {
         try {
             // The sub-select is used to preserve the notification setting. If
             // nothing is returned, the default is used.
-            psql = db_conn.prepareStatement("REPLACE INTO player (uuid,name,notify,automatic) SELECT ?,?,notify,automatic FROM player WHERE uuid=?))");
+            psql = db_conn.prepareStatement("INSERT INTO player (uuid,name) SELECT ?,? WHERE NOT EXISTS (SELECT 1 FROM player WHERE uuid=?)");
             psql.setString(1, offlinePlayer.getUniqueId().toString());
             psql.setString(2, offlinePlayer.getName());
             psql.setString(3, offlinePlayer.getUniqueId().toString());
