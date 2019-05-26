@@ -1,8 +1,13 @@
 version: '1.0'
 protectables:
     - ANVIL
+    - CHIPPED_ANVIL
+    - DAMAGED_ANVIL
     - BEACON
+    - BREWING_STAND
     - CHEST
+    - CAULDRON
+    - COMPARATOR
     - REPEATER
     - DISPENSER
     - DROPPER
@@ -10,6 +15,7 @@ protectables:
     - FURNACE
     - HOPPER
     - JUKEBOX
+    - NOTE_BLOCK
     - LEVER
     - STONE_BUTTON
     - OAK_TRAPDOOR
@@ -46,6 +52,14 @@ protectables:
     - OAK_PRESSURE_PLATE
     - SPRUCE_PRESSURE_PLATE
     - STONE_PRESSURE_PLATE
+    - BARREL
+    - BELL
+    - BLAST_FURNACE
+    - CAMPFIRE
+    - COMPOSTER
+    - DAYLIGHT_DETECTOR
+    - LECTERN
+    - SMOKER
 tool: STICK
 chatprefix: SL
 populateplayers: true

@@ -6,7 +6,7 @@
 
     <groupId>StickyLocks</groupId>
     <artifactId>StickyLocks</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <repositories>
         <repository>
             <id>spigot-repo</id>
