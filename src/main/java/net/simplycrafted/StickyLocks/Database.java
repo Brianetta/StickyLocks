@@ -299,6 +299,11 @@ public class Database {
             psql.setString(2, player.getName());
             psql.setString(3, player.getUniqueId().toString());
             psql.executeUpdate();
+            // Update the name, in case the previous sub-select returned 1
+            psql = db_conn.prepareStatement("UPDATE player SET name=? WHERE uuid=?");
+            psql.setString(1, player.getName());
+            psql.setString(2, player.getUniqueId().toString());
+            psql.executeUpdate();
             psql.close();
         } catch (SQLException e) {
             stickylocks.getLogger().info("Failed to insert/replace newly joined player");
